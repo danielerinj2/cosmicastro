@@ -141,6 +141,18 @@ def _apply_theme(theme_preference: str) -> None:
 [data-testid="stHeader"] {{
   background: {app_bg};
 }}
+[data-testid="stHeader"] button,
+[data-testid="stHeader"] [role="button"],
+[data-testid="collapsedControl"] {{
+  color: {text_color} !important;
+  background: transparent !important;
+  border: 1px solid {border_color} !important;
+}}
+[data-testid="stHeader"] button:hover,
+[data-testid="stHeader"] [role="button"]:hover,
+[data-testid="collapsedControl"]:hover {{
+  background: {card_bg} !important;
+}}
 [data-testid="stSidebar"] {{
   background: {panel_bg};
 }}
