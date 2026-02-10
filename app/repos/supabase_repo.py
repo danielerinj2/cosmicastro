@@ -290,6 +290,7 @@ class SupabaseRepository:
         partner_profile_id: str | None = None,
         profection_age: int | None = None,
     ) -> Reading:
+        created_at = iso_utc_now()
         payload = {
             "id": str(uuid4()),
             "user_id": user_id,
@@ -299,10 +300,56 @@ class SupabaseRepository:
             "profection_age": profection_age,
             "source_data": source_data,
             "content": content,
-            "created_at": iso_utc_now(),
+            "created_at": created_at,
         }
-        response = self.client.table("readings").insert(payload).execute()
-        return _row_to_reading(response.data[0])
+        try:
+            response = self.client.table("readings").insert(payload).execute()
+            return _row_to_reading(response.data[0])
+        except APIError as exc:
+            message = str(getattr(exc, "message", "")) or str(exc)
+            if getattr(exc, "code", "") != "23505":
+                raise
+
+            existing_id: str | None = None
+            if "uniq_yearly_chart_per_user_age" in message and profection_age is not None:
+                existing = (
+                    self.client.table("readings")
+                    .select("id")
+                    .eq("user_id", user_id)
+                    .eq("type", "yearly_chart")
+                    .eq("profection_age", profection_age)
+                    .limit(1)
+                    .execute()
+                )
+                if existing.data:
+                    existing_id = existing.data[0]["id"]
+
+            if existing_id is None:
+                fallback_existing = self.get_latest_reading(
+                    user_id=user_id,
+                    reading_type=reading_type,
+                    mode=None if reading_type == "yearly_chart" else mode,
+                    partner_profile_id=partner_profile_id,
+                    profection_age=profection_age,
+                )
+                if fallback_existing:
+                    existing_id = fallback_existing.id
+
+            if existing_id is None:
+                raise
+
+            self.client.table("readings").update(
+                {
+                    "mode": mode,
+                    "partner_profile_id": partner_profile_id,
+                    "profection_age": profection_age,
+                    "source_data": source_data,
+                    "content": content,
+                    "created_at": created_at,
+                }
+            ).eq("id", existing_id).execute()
+            refreshed = self.client.table("readings").select("*").eq("id", existing_id).limit(1).execute()
+            return _row_to_reading(refreshed.data[0])
 
     def list_readings(self, user_id: str, limit: int = 100) -> list[Reading]:
         response = (

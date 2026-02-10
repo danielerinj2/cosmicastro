@@ -164,10 +164,15 @@ class ReadingService:
         existing = self.repo.get_latest_reading(
             user_id=user.id,
             reading_type="yearly_chart",
-            mode=generated.mode,
+            mode=None,
             profection_age=age,
         )
-        if existing and not force_regenerate and not self._needs_yearly_upgrade(existing.content):
+        if (
+            existing
+            and not force_regenerate
+            and existing.mode == generated.mode
+            and not self._needs_yearly_upgrade(existing.content)
+        ):
             return existing
 
         generated.content["summary"]["llm_voice"] = self._voice(
