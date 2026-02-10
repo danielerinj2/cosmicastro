@@ -6,7 +6,7 @@ import streamlit as st
 
 from app.services.auth_service import AuthService
 from app.services.stripe_service import StripeService
-from app.ui.components import app_header, auth_sidebar
+from app.ui.components import app_header, auth_sidebar, format_time_ampm, parse_time_ampm
 from app.ui.session import get_current_user, init_session, logout_user, require_auth
 from app.utils.astro import sun_sign_for_date
 
@@ -61,34 +61,48 @@ else:
 
 st.divider()
 st.subheader("Edit Birth Data")
-with st.form("settings_birth_data_form"):
-    dob = st.date_input("Date of birth", value=user.dob, min_value=date(1900, 1, 1), max_value=date.today())
-    has_birth_time = st.checkbox("I know my birth time", value=user.birth_time is not None)
-    birth_time = st.time_input("Birth time", value=user.birth_time, disabled=not has_birth_time)
-    birth_location = st.text_input("Birth location", value=user.birth_location or "")
-    timezone = st.text_input("Timezone", value=user.timezone or "", placeholder="e.g. America/New_York")
-    lat = st.text_input("Latitude (optional)", value="" if user.lat is None else str(user.lat))
-    lng = st.text_input("Longitude (optional)", value="" if user.lng is None else str(user.lng))
-    save_birth_data = st.form_submit_button("Save Birth Data")
+dob = st.date_input("Date of birth", value=user.dob, min_value=date(1900, 1, 1), max_value=date.today())
+has_birth_time = st.checkbox("I know my birth time", value=user.birth_time is not None)
+if "settings_birth_time_ampm" not in st.session_state:
+    st.session_state["settings_birth_time_ampm"] = format_time_ampm(user.birth_time)
+if not has_birth_time:
+    st.session_state["settings_birth_time_ampm"] = ""
+birth_time = None
+if has_birth_time:
+    birth_time_raw = st.text_input(
+        "Birth time (AM/PM)",
+        key="settings_birth_time_ampm",
+        placeholder="e.g. 09:30 AM",
+    )
+    st.caption("Use format `HH:MM AM/PM`.")
+    birth_time = parse_time_ampm(birth_time_raw)
+birth_location = st.text_input("Birth location", value=user.birth_location or "")
+timezone = st.text_input("Timezone", value=user.timezone or "", placeholder="e.g. America/New_York")
+lat = st.text_input("Latitude (optional)", value="" if user.lat is None else str(user.lat))
+lng = st.text_input("Longitude (optional)", value="" if user.lng is None else str(user.lng))
+save_birth_data = st.button("Save Birth Data", type="primary")
 
 if save_birth_data:
-    try:
-        parsed_lat = float(lat) if lat.strip() else None
-        parsed_lng = float(lng) if lng.strip() else None
-    except ValueError:
-        st.error("Latitude/Longitude must be numeric.")
+    if has_birth_time and birth_time is None:
+        st.error("Please enter birth time in `HH:MM AM/PM` format.")
     else:
-        updated = auth.update_birth_data(
-            user.id,
-            dob=dob,
-            birth_time=birth_time.isoformat() if has_birth_time else None,
-            birth_location=birth_location.strip() or None,
-            lat=parsed_lat,
-            lng=parsed_lng,
-            timezone=timezone.strip() or None,
-        )
-        st.success(f"Birth data updated. Sun sign now: {updated.sun_sign or sun_sign_for_date(updated.dob)}")
-        st.info("Origin and yearly readings will recalculate on next open if the birth signature changed.")
+        try:
+            parsed_lat = float(lat) if lat.strip() else None
+            parsed_lng = float(lng) if lng.strip() else None
+        except ValueError:
+            st.error("Latitude/Longitude must be numeric.")
+        else:
+            updated = auth.update_birth_data(
+                user.id,
+                dob=dob,
+                birth_time=birth_time.isoformat() if birth_time else None,
+                birth_location=birth_location.strip() or None,
+                lat=parsed_lat,
+                lng=parsed_lng,
+                timezone=timezone.strip() or None,
+            )
+            st.success(f"Birth data updated. Sun sign now: {updated.sun_sign or sun_sign_for_date(updated.dob)}")
+            st.info("Origin and yearly readings will recalculate on next open if the birth signature changed.")
 
 st.divider()
 st.subheader("Change Password")

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import re
+from datetime import time
 
 import streamlit as st
 
@@ -8,6 +10,8 @@ from app.constants import LAUNCH_TRUST_MESSAGE
 from app.domain.models import User
 from app.services.stripe_service import StripeService
 from app.ui.session import logout_user
+
+_AMPM_TIME_RE = re.compile(r"^\s*(1[0-2]|0?[1-9]):([0-5][0-9])\s*([AaPp][Mm])\s*$")
 
 
 def app_header(title: str, subtitle: str | None = None) -> None:
@@ -71,3 +75,28 @@ def premium_upgrade_block(user: User, feature_name: str) -> bool:
             else:
                 st.error(result.message)
     return False
+
+
+def format_time_ampm(value: time | None) -> str:
+    if value is None:
+        return ""
+    hour = value.hour % 12 or 12
+    meridiem = "AM" if value.hour < 12 else "PM"
+    return f"{hour:02d}:{value.minute:02d} {meridiem}"
+
+
+def parse_time_ampm(value: str) -> time | None:
+    raw = value.strip()
+    if not raw:
+        return None
+    match = _AMPM_TIME_RE.match(raw)
+    if not match:
+        return None
+    hour = int(match.group(1))
+    minute = int(match.group(2))
+    meridiem = match.group(3).upper()
+    if meridiem == "AM":
+        hour_24 = 0 if hour == 12 else hour
+    else:
+        hour_24 = 12 if hour == 12 else hour + 12
+    return time(hour=hour_24, minute=minute)
