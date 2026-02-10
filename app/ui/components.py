@@ -21,6 +21,8 @@ def app_header(title: str, subtitle: str | None = None) -> None:
 
 
 def auth_sidebar(user: User | None) -> None:
+    theme_preference = user.theme_preference if user else "dark"
+    _apply_theme(theme_preference)
     with st.sidebar:
         st.markdown("## Discover Your Cosmic Self")
         if user:
@@ -100,3 +102,64 @@ def parse_time_ampm(value: str) -> time | None:
     else:
         hour_24 = 12 if hour == 12 else hour + 12
     return time(hour=hour_24, minute=minute)
+
+
+def _apply_theme(theme_preference: str) -> None:
+    theme = "light" if theme_preference == "light" else "dark"
+    if theme == "light":
+        app_bg = "#f5f7fb"
+        panel_bg = "#edf2f7"
+        card_bg = "#ffffff"
+        text_color = "#0f172a"
+        border_color = "#cbd5e1"
+        muted_text = "#475569"
+    else:
+        app_bg = "#0f172a"
+        panel_bg = "#111827"
+        card_bg = "#1f2937"
+        text_color = "#e5e7eb"
+        border_color = "#374151"
+        muted_text = "#9ca3af"
+
+    st.markdown(
+        f"""
+<style>
+[data-testid="stAppViewContainer"] {{
+  background: {app_bg};
+  color: {text_color};
+}}
+[data-testid="stHeader"] {{
+  background: {app_bg};
+}}
+[data-testid="stSidebar"] {{
+  background: {panel_bg};
+}}
+[data-testid="stSidebar"] * {{
+  color: {text_color} !important;
+}}
+[data-testid="stMarkdownContainer"], .stCaption, label, p, h1, h2, h3, h4, h5, h6 {{
+  color: {text_color} !important;
+}}
+.stAlert {{
+  border: 1px solid {border_color};
+}}
+.stTextInput input, .stTextArea textarea, .stNumberInput input, .stDateInput input {{
+  background: {card_bg};
+  color: {text_color};
+  border: 1px solid {border_color};
+}}
+[data-baseweb="select"] > div {{
+  background: {card_bg};
+  color: {text_color};
+  border-color: {border_color};
+}}
+.stRadio [role="radiogroup"] label, .stCheckbox label {{
+  color: {text_color} !important;
+}}
+.stSlider [data-testid="stTickBarMin"], .stSlider [data-testid="stTickBarMax"] {{
+  color: {muted_text};
+}}
+</style>
+        """,
+        unsafe_allow_html=True,
+    )

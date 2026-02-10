@@ -18,6 +18,9 @@ auth = AuthService()
 stripe = StripeService()
 
 app_header("Settings / Profile", "Manage account, birth data, preferences, and subscription status.")
+if st.session_state.get("settings_preferences_saved"):
+    st.success("Preferences saved.")
+    st.session_state["settings_preferences_saved"] = False
 
 st.subheader("Subscription")
 st.write(f"Current tier: **{user.subscription_tier}**")
@@ -143,8 +146,8 @@ if save_preferences:
         daily_reading_hour=daily_hour,
         notify_transit_alerts=notify_transits,
     )
-    st.success("Preferences saved.")
-    st.caption(f"Theme: {updated.theme_preference} · Daily reminder hour: {updated.daily_reading_hour}:00")
+    st.session_state["settings_preferences_saved"] = True
+    st.rerun()
 
 st.divider()
 st.subheader("Data & Privacy")
