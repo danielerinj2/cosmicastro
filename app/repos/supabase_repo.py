@@ -4,6 +4,8 @@ from datetime import date, datetime, timedelta
 from typing import Any
 from uuid import uuid4
 
+from postgrest.exceptions import APIError
+
 from app.constants import DEFAULT_DAILY_READING_HOUR
 from app.domain.models import PartnerProfile, Reading, TokenRecord, User
 from app.infra.supabase_client import get_supabase_client
@@ -205,16 +207,41 @@ class SupabaseRepository:
     # Tokens
     def create_token(self, user_id: str, token_value: str, token_type: str, expires_hours: int) -> TokenRecord:
         now = utc_now()
+        expires_at = (now + timedelta(hours=expires_hours)).isoformat()
         payload = {
             "id": str(uuid4()),
             "user_id": user_id,
             "token": token_value,
             "type": token_type,
-            "expires_at": (now + timedelta(hours=expires_hours)).isoformat(),
+            "expires_at": expires_at,
             "used": False,
             "created_at": now.isoformat(),
         }
-        response = self.client.table("tokens").insert(payload).execute()
+        try:
+            response = self.client.table("tokens").insert(payload).execute()
+        except APIError as exc:
+            message = str(getattr(exc, "message", "")) or str(exc)
+            if getattr(exc, "code", "") != "23505" or "uniq_tokens_user_type_active" not in message:
+                raise
+
+            # Schema enforces one active token per (user_id, type). Rotate existing active token.
+            self.client.table("tokens").update(
+                {
+                    "token": token_value,
+                    "expires_at": expires_at,
+                    "used": False,
+                    "created_at": now.isoformat(),
+                }
+            ).eq("user_id", user_id).eq("type", token_type).eq("used", False).execute()
+            response = (
+                self.client.table("tokens")
+                .select("*")
+                .eq("user_id", user_id)
+                .eq("type", token_type)
+                .eq("used", False)
+                .limit(1)
+                .execute()
+            )
         return _row_to_token(response.data[0])
 
     def get_token(self, token_value: str, token_type: str) -> TokenRecord | None:
