@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 
 import streamlit as st
 
@@ -127,10 +127,14 @@ if change_password_btn:
 
 st.divider()
 st.subheader("Notification and Theme Preferences")
+hour_options = list(range(24))
 with st.form("settings_preferences_form"):
     notify_daily = st.checkbox("Daily reading reminders", value=user.notify_daily_reading)
-    daily_hour = st.slider(
-        "Daily reading hour (24h)", min_value=0, max_value=23, value=user.daily_reading_hour or 8, step=1
+    daily_hour = st.selectbox(
+        "Daily reminder time",
+        options=hour_options,
+        index=user.daily_reading_hour if user.daily_reading_hour is not None else 8,
+        format_func=lambda h: datetime(2000, 1, 1, h, 0).strftime("%I:00 %p"),
     )
     notify_transits = st.checkbox("Transit alerts", value=user.notify_transit_alerts)
     theme = st.selectbox("Theme", options=["dark", "light"], index=0 if user.theme_preference == "dark" else 1)

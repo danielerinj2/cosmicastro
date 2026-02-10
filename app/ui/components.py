@@ -157,7 +157,25 @@ def _apply_theme(theme_preference: str) -> None:
   color: {button_fg} !important;
   border: 1px solid {button_border} !important;
 }}
+[data-testid="stSidebar"] .stFormSubmitButton > button {{
+  background: {button_bg} !important;
+  color: {button_fg} !important;
+  border: 1px solid {button_border} !important;
+}}
 [data-testid="stSidebar"] .stButton > button:hover {{
+  filter: brightness(0.98);
+}}
+[data-testid="stSidebar"] .stFormSubmitButton > button:hover {{
+  filter: brightness(0.98);
+}}
+[data-testid="stAppViewContainer"] .stButton > button,
+[data-testid="stAppViewContainer"] .stFormSubmitButton > button {{
+  background: {button_bg} !important;
+  color: {button_fg} !important;
+  border: 1px solid {button_border} !important;
+}}
+[data-testid="stAppViewContainer"] .stButton > button:hover,
+[data-testid="stAppViewContainer"] .stFormSubmitButton > button:hover {{
   filter: brightness(0.98);
 }}
 [data-testid="stMarkdownContainer"], .stCaption, label, p, h1, h2, h3, h4, h5, h6 {{
