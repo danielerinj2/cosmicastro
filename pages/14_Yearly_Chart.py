@@ -60,31 +60,5 @@ for item in content.get("timeline", []):
     st.write(f"**{item['segment']}**")
     st.write(item["llm_text"])
 
-prompts = content.get("practices_and_prompts", [])
-if prompts:
-    st.subheader("Work With This Year")
-    st.caption("Pick one prompt and write a short reflection you can revisit later.")
-    for idx, prompt in enumerate(prompts, start=1):
-        st.write(f"{idx}. {prompt}")
-        if st.button(f"Use Prompt {idx}", key=f"year_prompt_{idx}"):
-            st.session_state["yearly_reflection_text"] = f"{prompt}\n\n"
-
-    reflection_text = st.text_area(
-        "Your yearly reflection",
-        key="yearly_reflection_text",
-        placeholder="Write what this year is asking from you in practical terms...",
-    )
-    if st.button("Save Reflection", type="primary"):
-        if not reflection_text.strip():
-            st.warning("Add a short reflection before saving.")
-        else:
-            service.record_reaction(
-                user_id=user.id,
-                reaction="thinking",
-                journal_text=reflection_text.strip(),
-                reading_id=reading.id,
-            )
-            st.success("Reflection saved to your journal history.")
-
 for note in content.get("disclaimers", []):
     st.warning(note)
