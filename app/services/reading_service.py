@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import date, timedelta
 from typing import Any
 
@@ -34,6 +35,72 @@ class ReadingService:
         )
         result = self.llm.generate(system_prompt=system, user_prompt=user, fallback_text=fallback)
         return result.text
+
+    def _daily_sections(
+        self,
+        *,
+        sign: str,
+        day: date,
+        fallback: dict[str, str],
+    ) -> dict[str, str]:
+        system = (
+            "You are an astrology writing assistant. Be psychologically literate, warm, direct, and non-predictive. "
+            "Return valid JSON only with keys: general, love, career, wellness. "
+            "Each value must be 2-3 sentences and practical, not mystical."
+        )
+        knowledge = get_relevant_context(f"daily horoscope {sign} {day.isoformat()}", max_snippets=2, max_chars=1500)
+        user = (
+            f"Sign: {sign}\n"
+            f"Date: {day.isoformat()}\n"
+            f"Knowledge Context (optional): {knowledge if knowledge else 'None'}\n"
+            "Output JSON only."
+        )
+        fallback_json = json.dumps(
+            {
+                "general": fallback["general"],
+                "love": fallback["love"],
+                "career": fallback["career"],
+                "wellness": fallback["wellness"],
+            }
+        )
+        raw = self.llm.generate(system_prompt=system, user_prompt=user, fallback_text=fallback_json).text.strip()
+        if raw.startswith("```"):
+            raw = raw.strip("`")
+            if raw.lower().startswith("json"):
+                raw = raw[4:].strip()
+
+        try:
+            parsed = json.loads(raw)
+        except Exception:
+            return {
+                "general": fallback["general"],
+                "love": fallback["love"],
+                "career": fallback["career"],
+                "wellness": fallback["wellness"],
+            }
+
+        sections: dict[str, str] = {}
+        for key in ("general", "love", "career", "wellness"):
+            value = str(parsed.get(key, "")).strip()
+            sections[key] = value if len(value) >= 80 else fallback[key]
+        return sections
+
+    @staticmethod
+    def _needs_daily_upgrade(content: dict[str, Any]) -> bool:
+        legacy_lines = {
+            "Name one need directly instead of hinting.",
+            "Prioritize one high-impact task and close it.",
+            "Reduce cognitive overload with one structured reset block.",
+        }
+        for key in ("love", "career", "wellness"):
+            value = str(content.get(key, "")).strip()
+            if not value:
+                return True
+            if value in legacy_lines:
+                return True
+            if len(value) < 80:
+                return True
+        return False
 
     def get_or_create_origin_chart(self, user: User, force_regenerate: bool = False) -> Reading:
         generated = self.engine.origin_chart(user)
@@ -134,19 +201,34 @@ class ReadingService:
     def get_or_create_daily_horoscope(self, user: User, day: date) -> dict[str, Any]:
         sign = user.sun_sign or sun_sign_for_date(user.dob)
         cached = self.repo.get_daily_horoscope(sign, day)
-        if cached:
+        if cached and not self._needs_daily_upgrade(cached.get("content", {})):
             return cached
 
         fallback = {
             "headline": f"{sign} daily theme",
-            "general": "Keep decisions simple today. Act on what is clear and defer what is noisy.",
-            "love": "Name one need directly instead of hinting.",
-            "career": "Prioritize one high-impact task and close it.",
-            "wellness": "Reduce cognitive overload with one structured reset block.",
+            "general": (
+                f"As a {sign}, today supports grounded clarity over speed. "
+                "Pause before reacting and choose the path that reduces friction instead of creating more of it. "
+                "Small intentional decisions will compound into a steadier day."
+            ),
+            "love": (
+                "Speak one emotional need clearly instead of hoping it gets inferred. "
+                "Lead with tone, not pressure, and ask a direct question that invites an honest answer. "
+                "Clarity today will prevent resentment later."
+            ),
+            "career": (
+                "Pick one meaningful task and move it to done before context-switching. "
+                "Set a visible boundary around your focus window and protect it from low-value noise. "
+                "Progress will come from completion, not volume."
+            ),
+            "wellness": (
+                "Reset your nervous system with one structured break: step away, hydrate, breathe, and re-enter slowly. "
+                "If your mind is crowded, write down the next three actions and ignore the rest for now. "
+                "Stability comes from rhythm, not intensity."
+            ),
         }
-        facts = f"sign={sign}, date={day.isoformat()}, tone=psychological direct non-predictive"
-        llm_text = self._voice("Daily Horoscope", facts, fallback["general"])
-        content = {**fallback, "general": llm_text}
+        sections = self._daily_sections(sign=sign, day=day, fallback=fallback)
+        content = {**fallback, **sections}
         return self.repo.upsert_daily_horoscope(sign, day, content)
 
     def get_or_create_moon_phase(self, day: date) -> dict[str, Any]:
