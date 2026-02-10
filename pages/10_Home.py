@@ -6,7 +6,7 @@ import streamlit as st
 
 from app.constants import REACTION_CHOICES
 from app.services.reading_service import ReadingService
-from app.ui.components import app_header, auth_sidebar
+from app.ui.components import app_header, auth_sidebar, render_unicorn_scene
 from app.ui.session import init_session, require_auth
 
 st.set_page_config(page_title="Home", page_icon="🏠", layout="wide")
@@ -21,6 +21,9 @@ st.caption(now.strftime("%A, %B %d, %Y"))
 
 context = service.home_context(user)
 st.info(context["trust_strip"])
+
+st.subheader("Cosmic Scene")
+render_unicorn_scene(height=420)
 
 daily = context["daily"]
 moon = context["moon"]

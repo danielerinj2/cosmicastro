@@ -5,6 +5,7 @@ import re
 from datetime import time
 
 import streamlit as st
+from streamlit.components.v1 import html as components_html
 
 from app.constants import LAUNCH_TRUST_MESSAGE
 from app.domain.models import User
@@ -12,6 +13,10 @@ from app.services.stripe_service import StripeService
 from app.ui.session import logout_user
 
 _AMPM_TIME_RE = re.compile(r"^\s*(1[0-2]|0?[1-9]):([0-5][0-9])\s*([AaPp][Mm])\s*$")
+UNICORN_PROJECT_ID = "prCymyNE9DjMip7xfyZf"
+UNICORN_SDK_URL = (
+    "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.5/dist/unicornStudio.umd.js"
+)
 
 
 def app_header(title: str, subtitle: str | None = None) -> None:
@@ -102,6 +107,34 @@ def parse_time_ampm(value: str) -> time | None:
     else:
         hour_24 = 12 if hour == 12 else hour + 12
     return time(hour=hour_24, minute=minute)
+
+
+def render_unicorn_scene(height: int = 400) -> None:
+    container_height = max(int(height), 280)
+    snippet = f"""
+<div id="unicorn-container" style="width:100%; height:{container_height}px;"></div>
+<script src="{UNICORN_SDK_URL}"></script>
+<script>
+(async function () {{
+  try {{
+    if (!window.UnicornStudio) return;
+    await window.UnicornStudio.addScene({{
+      elementId: "unicorn-container",
+      projectId: "{UNICORN_PROJECT_ID}",
+      scale: 1,
+      dpi: 1.5,
+      fps: 60,
+      lazyLoad: true,
+      production: true
+    }});
+  }} catch (e) {{
+    // Silent fail with placeholder text below.
+  }}
+}})();
+</script>
+<noscript>Enable JavaScript to view the interactive scene.</noscript>
+"""
+    components_html(snippet, height=container_height, scrolling=False)
 
 
 def _apply_theme(theme_preference: str) -> None:
