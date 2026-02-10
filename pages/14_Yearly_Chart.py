@@ -39,8 +39,10 @@ if content["summary"].get("llm_voice"):
 st.subheader("Year Meta")
 st.write(f"- Age: {meta['age']}")
 st.write(f"- Profection year: {meta['year_label']}")
-st.write(f"- Window: {meta['window']}")
-st.write(f"- Mode: {meta['mode_label']}")
+st.caption(
+    "A profection year is the life area that gets emphasized from one birthday to the next. "
+    "Think of it as this year’s primary theme."
+)
 
 st.subheader("House Focus")
 st.write(content["house_focus"]["label"])
@@ -51,16 +53,38 @@ if content.get("ruling_planet_section"):
     st.write(f"**{content['ruling_planet_section']['planet']}**")
     st.write(content["ruling_planet_section"]["llm_text"])
 else:
-    st.info("Add birth time and place in Settings to unlock full ruling-planet details.")
+    st.caption("Ruling-planet detail is limited in birth-date-only mode.")
 
 st.subheader("How the Year Unfolds")
 for item in content.get("timeline", []):
     st.write(f"**{item['segment']}**")
     st.write(item["llm_text"])
 
-st.subheader("Practices and Prompts")
-for prompt in content.get("practices_and_prompts", []):
-    st.write(f"- {prompt}")
+prompts = content.get("practices_and_prompts", [])
+if prompts:
+    st.subheader("Work With This Year")
+    st.caption("Pick one prompt and write a short reflection you can revisit later.")
+    for idx, prompt in enumerate(prompts, start=1):
+        st.write(f"{idx}. {prompt}")
+        if st.button(f"Use Prompt {idx}", key=f"year_prompt_{idx}"):
+            st.session_state["yearly_reflection_text"] = f"{prompt}\n\n"
+
+    reflection_text = st.text_area(
+        "Your yearly reflection",
+        key="yearly_reflection_text",
+        placeholder="Write what this year is asking from you in practical terms...",
+    )
+    if st.button("Save Reflection", type="primary"):
+        if not reflection_text.strip():
+            st.warning("Add a short reflection before saving.")
+        else:
+            service.record_reaction(
+                user_id=user.id,
+                reaction="thinking",
+                journal_text=reflection_text.strip(),
+                reading_id=reading.id,
+            )
+            st.success("Reflection saved to your journal history.")
 
 for note in content.get("disclaimers", []):
     st.warning(note)

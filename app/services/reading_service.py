@@ -102,6 +102,23 @@ class ReadingService:
                 return True
         return False
 
+    @staticmethod
+    def _needs_yearly_upgrade(content: dict[str, Any]) -> bool:
+        meta = content.get("meta", {})
+        year_label = str(meta.get("year_label", ""))
+        if any(tag in year_label for tag in ("1th", "2th", "3th")):
+            return True
+
+        timeline = content.get("timeline", [])
+        if len(timeline) >= 3:
+            texts = [str(item.get("llm_text", "")).strip() for item in timeline]
+            if all("the key focus remains" in text.lower() for text in texts):
+                return True
+            if len(set(texts)) == 1:
+                return True
+
+        return False
+
     def get_or_create_origin_chart(self, user: User, force_regenerate: bool = False) -> Reading:
         generated = self.engine.origin_chart(user)
         existing = self.repo.get_latest_reading(
@@ -150,7 +167,7 @@ class ReadingService:
             mode=generated.mode,
             profection_age=age,
         )
-        if existing and not force_regenerate:
+        if existing and not force_regenerate and not self._needs_yearly_upgrade(existing.content):
             return existing
 
         generated.content["summary"]["llm_voice"] = self._voice(

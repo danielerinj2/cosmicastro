@@ -39,6 +39,14 @@ class AstroEngine(Protocol):
 
 
 class DeterministicAstroEngine:
+    @staticmethod
+    def _ordinal(value: int) -> str:
+        if 10 <= (value % 100) <= 20:
+            suffix = "th"
+        else:
+            suffix = {1: "st", 2: "nd", 3: "rd"}.get(value % 10, "th")
+        return f"{value}{suffix}"
+
     def origin_chart(self, user: User) -> EngineResult:
         full_mode = bool(user.birth_time and user.lat is not None and user.lng is not None and user.timezone)
         mode = "full" if full_mode else "sign_only"
@@ -130,23 +138,39 @@ class DeterministicAstroEngine:
 
         timeline = [
             {
-                "segment": segment,
-                "llm_text": f"{segment}: the key focus remains {house_topic.lower()} with practical integration.",
-            }
-            for segment in YEARLY_TIMELINE_SEGMENTS
+                "segment": YEARLY_TIMELINE_SEGMENTS[0],
+                "llm_text": (
+                    f"Beginning of the year is about setting direction around {house_topic.lower()}. "
+                    "You are likely to notice what requires structure, what can be simplified, and what deserves clear priority."
+                ),
+            },
+            {
+                "segment": YEARLY_TIMELINE_SEGMENTS[1],
+                "llm_text": (
+                    f"Middle of the year tests commitment to {house_topic.lower()}. "
+                    "This phase often brings tradeoffs, feedback, and practical adjustments that make the path more realistic."
+                ),
+            },
+            {
+                "segment": YEARLY_TIMELINE_SEGMENTS[2],
+                "llm_text": (
+                    f"Closing months focus on integrating lessons in {house_topic.lower()}. "
+                    "You consolidate what worked, release what drained energy, and carry clearer momentum into the next cycle."
+                ),
+            },
         ]
 
         content = {
             "summary": {
-                "headline": f"This is a {house}th-house year focused on {house_topic.lower()}.",
+                "headline": f"This is a {self._ordinal(house)}-house year focused on {house_topic.lower()}.",
                 "paragraphs": [
-                    "This report is interpretive guidance, not a fixed prediction.",
-                    "Use this year to make intentional choices that align with the activated house themes.",
+                    "A profection year means each birthday activates a different life area in a repeating 12-year cycle.",
+                    f"Your current cycle activates the {self._ordinal(house)} house, so decisions tied to {house_topic.lower()} carry extra weight this year.",
                 ],
             },
             "meta": {
                 "age": age,
-                "year_label": f"{house}th house year",
+                "year_label": f"{self._ordinal(house)} house year",
                 "mode_label": mode_label,
                 "window": f"{year_start.isoformat()} -> {year_end.isoformat()}",
             },
@@ -274,4 +298,3 @@ class DeterministicAstroEngine:
             ),
         }
         return EngineResult(mode=mode, source_data=source_data, content=content)
-
