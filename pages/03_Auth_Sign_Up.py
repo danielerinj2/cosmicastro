@@ -17,7 +17,7 @@ auth = AuthService()
 app_header("Auth - Sign Up", "Create your account and save your birth data.")
 
 if current_user:
-    st.success("You are already signed in.")
+    st.switch_page("pages/10_Home.py")
     st.stop()
 
 first_name = st.text_input("First name")

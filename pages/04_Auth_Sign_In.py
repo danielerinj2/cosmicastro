@@ -15,7 +15,7 @@ auth = AuthService()
 app_header("Auth - Sign In", "Access your chart and readings.")
 
 if current_user:
-    st.success("You are already signed in.")
+    st.switch_page("pages/10_Home.py")
     st.stop()
 
 with st.form("signin_form"):
@@ -44,4 +44,3 @@ if reset_submitted:
         st.success(result.message)
     else:
         st.error(result.message)
-
