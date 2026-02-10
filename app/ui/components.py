@@ -27,7 +27,7 @@ def auth_sidebar(user: User | None) -> None:
         st.markdown("## Discover Your Cosmic Self")
         if user:
             st.write(f"Signed in as **{user.first_name}**")
-            st.write(f"Plan: `{user.subscription_tier}`")
+            st.write(f"Plan: {user.subscription_tier.title()}")
             if st.button("Log out"):
                 logout_user()
                 st.rerun()
@@ -113,6 +113,11 @@ def _apply_theme(theme_preference: str) -> None:
         text_color = "#0f172a"
         border_color = "#cbd5e1"
         muted_text = "#475569"
+        button_bg = "#ffffff"
+        button_fg = "#0f172a"
+        button_border = "#94a3b8"
+        code_bg = "#e2e8f0"
+        code_fg = "#0f172a"
     else:
         app_bg = "#0f172a"
         panel_bg = "#111827"
@@ -120,6 +125,11 @@ def _apply_theme(theme_preference: str) -> None:
         text_color = "#e5e7eb"
         border_color = "#374151"
         muted_text = "#9ca3af"
+        button_bg = "#374151"
+        button_fg = "#e5e7eb"
+        button_border = "#4b5563"
+        code_bg = "#0b1220"
+        code_fg = "#e5e7eb"
 
     st.markdown(
         f"""
@@ -136,6 +146,19 @@ def _apply_theme(theme_preference: str) -> None:
 }}
 [data-testid="stSidebar"] * {{
   color: {text_color} !important;
+}}
+[data-testid="stSidebar"] code {{
+  background: {code_bg} !important;
+  color: {code_fg} !important;
+  border: 1px solid {border_color};
+}}
+[data-testid="stSidebar"] .stButton > button {{
+  background: {button_bg} !important;
+  color: {button_fg} !important;
+  border: 1px solid {button_border} !important;
+}}
+[data-testid="stSidebar"] .stButton > button:hover {{
+  filter: brightness(0.98);
 }}
 [data-testid="stMarkdownContainer"], .stCaption, label, p, h1, h2, h3, h4, h5, h6 {{
   color: {text_color} !important;
