@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
 from urllib.parse import urlencode
 
@@ -18,7 +17,7 @@ class EmailResult:
 class EmailService:
     def __init__(self) -> None:
         self.config = AppConfig.from_env()
-        self.base_app_url = os.getenv("APP_BASE_URL", "http://localhost:8501").rstrip("/")
+        self.base_app_url = self.config.app_base_url.rstrip("/")
 
     def _build_app_link(self, params: dict[str, str]) -> str:
         query = urlencode(params)
