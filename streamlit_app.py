@@ -26,8 +26,18 @@ except Exception as exc:
 auth_sidebar(user)
 
 params = st.query_params
-verify_token = params.get("verify_token")
-reset_token = params.get("reset_token")
+
+
+def _query_value(key: str) -> str | None:
+    value = params.get(key)
+    if isinstance(value, list):
+        return value[0] if value else None
+    return value
+
+
+# Backward + forward compatible token keys.
+verify_token = _query_value("vt") or _query_value("verify_token")
+reset_token = _query_value("rt") or _query_value("reset_token") or _query_value("token")
 
 app_header(
     "Discover Your Cosmic Self",

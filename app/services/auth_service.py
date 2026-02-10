@@ -53,7 +53,8 @@ class AuthService:
             sun_sign=sun_sign_for_date(dob),
         )
 
-        verify_token = generate_token()
+        # 16 bytes keeps links shorter while retaining strong entropy.
+        verify_token = generate_token(length=16)
         self.repo.create_token(user.id, verify_token, "email_verification", expires_hours=24)
         self.email.send_email_verification_email(
             to_email=user.email,
@@ -77,7 +78,8 @@ class AuthService:
             # Avoid user enumeration.
             return AuthResult(ok=True, message="If that email exists, a reset link has been sent.")
 
-        reset_token = generate_token()
+        # 16 bytes keeps links shorter while retaining strong entropy.
+        reset_token = generate_token(length=16)
         self.repo.create_token(user.id, reset_token, "password_reset", expires_hours=1)
         self.email.send_password_reset_email(
             to_email=user.email,

@@ -13,8 +13,13 @@ auth = AuthService()
 
 app_header("Auth - Password Reset", "Use token from email to reset password manually.")
 
+params = st.query_params
+prefill_token = params.get("rt") or params.get("reset_token") or params.get("token")
+if isinstance(prefill_token, list):
+    prefill_token = prefill_token[0] if prefill_token else ""
+
 with st.form("manual_password_reset_form"):
-    token = st.text_input("Reset token")
+    token = st.text_input("Reset token", value=prefill_token or "")
     new_password = st.text_input("New password", type="password")
     confirm_password = st.text_input("Confirm password", type="password")
     submitted = st.form_submit_button("Reset Password")
@@ -30,4 +35,3 @@ if submitted:
             st.success(result.message)
         else:
             st.error(result.message)
-
