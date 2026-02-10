@@ -179,15 +179,11 @@ class SupabaseRepository:
 
     def update_user(self, user_id: str, updates: dict[str, Any]) -> User:
         updates = {**updates, "updated_at": iso_utc_now()}
-        response = (
-            self.client.table("users")
-            .update(updates)
-            .eq("id", user_id)
-            .select("*")
-            .limit(1)
-            .execute()
-        )
-        return _row_to_user(response.data[0])
+        self.client.table("users").update(updates).eq("id", user_id).execute()
+        refreshed = self.get_user_by_id(user_id)
+        if refreshed is None:
+            raise ValueError(f"User not found after update: {user_id}")
+        return refreshed
 
     def delete_user_full(self, user_id: str) -> None:
         # Explicit child cleanup for schemas without ON DELETE CASCADE.
@@ -336,15 +332,17 @@ class SupabaseRepository:
     def upsert_daily_horoscope(self, sign: str, day: date, content: dict[str, Any]) -> dict[str, Any]:
         existing = self.get_daily_horoscope(sign, day)
         if existing:
-            response = (
+            self.client.table("daily_horoscopes_cache").update(
+                {"content": content, "created_at": iso_utc_now()}
+            ).eq("id", existing["id"]).execute()
+            refreshed = (
                 self.client.table("daily_horoscopes_cache")
-                .update({"content": content, "created_at": iso_utc_now()})
-                .eq("id", existing["id"])
                 .select("*")
+                .eq("id", existing["id"])
                 .limit(1)
                 .execute()
             )
-            return response.data[0]
+            return refreshed.data[0]
 
         payload = {
             "id": str(uuid4()),
@@ -389,15 +387,18 @@ class SupabaseRepository:
             .execute()
         )
         if existing.data:
-            response = (
+            row_id = existing.data[0]["id"]
+            self.client.table("moon_phase_cache").update(
+                {"content": content, "created_at": iso_utc_now()}
+            ).eq("id", row_id).execute()
+            refreshed = (
                 self.client.table("moon_phase_cache")
-                .update({"content": content, "created_at": iso_utc_now()})
-                .eq("id", existing.data[0]["id"])
                 .select("*")
+                .eq("id", row_id)
                 .limit(1)
                 .execute()
             )
-            return response.data[0]
+            return refreshed.data[0]
 
         payload = {
             "id": str(uuid4()),
