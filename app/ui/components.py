@@ -167,6 +167,29 @@ def _apply_theme(theme_preference: str) -> None:
     st.markdown(
         f"""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;500&display=swap');
+
+html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebar"] {{
+  font-family: "Sora", sans-serif !important;
+  font-weight: 300 !important;
+}}
+
+h1, h2, h3, h4, h5, h6,
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] h4,
+[data-testid="stSidebar"] h5,
+[data-testid="stSidebar"] h6 {{
+  font-family: "Sora", sans-serif !important;
+  font-weight: 500 !important;
+}}
+
+button, input, textarea, select, label, p, span, li, small, div {{
+  font-family: "Sora", sans-serif !important;
+  font-weight: 300 !important;
+}}
+
 [data-testid="stAppViewContainer"] {{
   background: {app_bg};
   color: {text_color};
