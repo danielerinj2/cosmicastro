@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-import json
 from html import escape
 from typing import Any
 
 import streamlit as st
 
-from app.content.homepage_content import (
-    DEFAULT_HOMEPAGE_CONTENT,
-    load_homepage_content,
-    save_homepage_content,
-)
+from app.content.homepage_content import load_homepage_content
 from app.services.auth_service import AuthService
 from app.ui.components import auth_sidebar
 from app.ui.session import get_current_user, init_session
@@ -94,34 +89,7 @@ chat_target = "pages/17_Orbit_AI_Chat.py" if user else "pages/04_Auth_Sign_In.py
 homepage_content = load_homepage_content()
 
 if user:
-    with st.expander("Edit Homepage Content", expanded=False):
-        st.caption(
-            "Manual editor for homepage copy. Edit JSON and click Save. "
-            "Changes are saved to app/content/homepage_content.json."
-        )
-        raw_json = st.text_area(
-            "Homepage Content JSON",
-            value=json.dumps(homepage_content, ensure_ascii=True, indent=2),
-            height=520,
-            key="homepage_editor_json",
-        )
-        col_save, col_reset = st.columns(2)
-        with col_save:
-            if st.button("Save Homepage Content", key="save_homepage_content"):
-                try:
-                    parsed = json.loads(raw_json)
-                    if not isinstance(parsed, dict):
-                        raise ValueError("JSON root must be an object.")
-                    save_homepage_content(parsed)
-                    st.success("Homepage content saved.")
-                    st.rerun()
-                except Exception as exc:
-                    st.error(f"Could not save content: {exc}")
-        with col_reset:
-            if st.button("Reset To Default Content", key="reset_homepage_content"):
-                save_homepage_content(DEFAULT_HOMEPAGE_CONTENT)
-                st.success("Homepage content reset to defaults.")
-                st.rerun()
+    st.page_link("pages/08_Homepage_CMS.py", label="Open Homepage Editor", icon="🛠️")
 
 hero = _as_dict(homepage_content.get("hero"))
 hero_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("hero"))
