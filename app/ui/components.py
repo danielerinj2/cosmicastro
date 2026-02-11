@@ -167,11 +167,11 @@ def _apply_theme(theme_preference: str) -> None:
     st.markdown(
         f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
 html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebar"] {{
-  font-family: "Sora", sans-serif !important;
-  font-weight: 300 !important;
+  font-family: "Inter", sans-serif !important;
+  font-weight: 400 !important;
 }}
 
 h1, h2, h3, h4, h5, h6,
@@ -181,13 +181,13 @@ h1, h2, h3, h4, h5, h6,
 [data-testid="stSidebar"] h4,
 [data-testid="stSidebar"] h5,
 [data-testid="stSidebar"] h6 {{
-  font-family: "Sora", sans-serif !important;
-  font-weight: 500 !important;
+  font-family: "Inter", sans-serif !important;
+  font-weight: 700 !important;
 }}
 
 button, input, textarea, select, label, p, span, li, small, div {{
-  font-family: "Sora", sans-serif !important;
-  font-weight: 300 !important;
+  font-family: "Inter", sans-serif !important;
+  font-weight: 400 !important;
 }}
 
 [data-testid="stAppViewContainer"] {{
