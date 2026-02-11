@@ -33,11 +33,32 @@ def auth_sidebar(user: User | None) -> None:
         if user:
             st.write(f"Signed in as **{user.first_name}**")
             st.write(f"Plan: {user.subscription_tier.title()}")
+            st.divider()
+            st.markdown("### App")
+            st.page_link("streamlit_app.py", label="Landing")
+            st.page_link("pages/10_Home.py", label="Home")
+            st.page_link("pages/12_Daily_Horoscope.py", label="Daily Horoscope")
+            st.page_link("pages/11_Origin_Chart.py", label="Origin Chart")
+            st.page_link("pages/13_Between_Us.py", label="Between Us")
+            st.page_link("pages/14_Yearly_Chart.py", label="Yearly Chart")
+            st.page_link("pages/16_Journal_History.py", label="Journal History")
+            st.page_link("pages/17_Orbit_AI_Chat.py", label="Orbit AI Chat")
+            st.page_link("pages/15_Settings_Profile.py", label="Settings")
+
+            st.divider()
+            st.markdown("### Admin")
+            st.page_link("pages/08_Homepage_CMS.py", label="Homepage CMS")
             if st.button("Log out"):
                 logout_user()
                 st.rerun()
         else:
             st.write("Not signed in.")
+            st.divider()
+            st.markdown("### Access")
+            st.page_link("streamlit_app.py", label="Landing")
+            st.page_link("pages/03_Auth_Sign_Up.py", label="Sign Up")
+            st.page_link("pages/04_Auth_Sign_In.py", label="Sign In")
+            st.page_link("pages/05_Auth_Password_Reset.py", label="Reset Password")
         st.divider()
         st.info(LAUNCH_TRUST_MESSAGE)
 
