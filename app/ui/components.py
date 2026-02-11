@@ -172,6 +172,8 @@ def _apply_theme(theme_preference: str) -> None:
         button_border = "#94a3b8"
         code_bg = "#e2e8f0"
         code_fg = "#0f172a"
+        sidebar_link_bg = "#e2e8f0"
+        sidebar_link_hover_bg = "#dbeafe"
     else:
         app_bg = "#0f172a"
         panel_bg = "#111827"
@@ -184,6 +186,8 @@ def _apply_theme(theme_preference: str) -> None:
         button_border = "#4b5563"
         code_bg = "#0b1220"
         code_fg = "#e5e7eb"
+        sidebar_link_bg = "#1f2937"
+        sidebar_link_hover_bg = "#273244"
 
     st.markdown(
         f"""
@@ -234,6 +238,31 @@ button, input, textarea, select, label, p, span, li, small, div {{
   background: {panel_bg};
 }}
 [data-testid="stSidebar"] * {{
+  color: {text_color} !important;
+}}
+[data-testid="stSidebar"] [data-testid="stPageLink"] a,
+[data-testid="stSidebar"] [data-testid="stPageLink"] a *,
+[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"],
+[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"] * {{
+  color: {text_color} !important;
+  opacity: 1 !important;
+}}
+[data-testid="stSidebar"] [data-testid="stPageLink"] a {{
+  border-radius: 10px !important;
+  border: 1px solid transparent !important;
+}}
+[data-testid="stSidebar"] [data-testid="stPageLink"] a:hover {{
+  background: {sidebar_link_hover_bg} !important;
+  border-color: {border_color} !important;
+}}
+[data-testid="stSidebar"] [data-testid="stPageLink"] a[aria-current="page"],
+[data-testid="stSidebar"] [data-testid="stPageLink"] a[aria-selected="true"] {{
+  background: {sidebar_link_bg} !important;
+  border-color: {border_color} !important;
+}}
+[data-testid="stSidebar"] [data-testid="stPageLink"] a[aria-disabled="true"],
+[data-testid="stSidebar"] [data-testid="stPageLink"] a:disabled {{
+  opacity: 1 !important;
   color: {text_color} !important;
 }}
 [data-testid="stSidebar"] code {{

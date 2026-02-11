@@ -4,8 +4,13 @@ import requests
 import streamlit as st
 
 from app.config import AppConfig
+from app.ui.components import auth_sidebar
+from app.ui.session import get_current_user, init_session
 
 st.set_page_config(page_title="Stripe Connection Check", page_icon="💳", layout="wide")
+init_session()
+auth_sidebar(get_current_user())
+
 st.title("Stripe Connection Check")
 st.caption("Validate Stripe key and configured price ids.")
 
@@ -35,4 +40,3 @@ if st.button("Run Live Stripe Check", type="primary"):
         st.error(f"Stripe HTTP {response.status_code}: {response.text[:300]}")
     else:
         st.success("Stripe API key is valid.")
-

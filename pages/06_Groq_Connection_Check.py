@@ -4,8 +4,12 @@ import streamlit as st
 
 from app.config import AppConfig
 from app.services.llm_service import LLMService
+from app.ui.components import auth_sidebar
+from app.ui.session import get_current_user, init_session
 
 st.set_page_config(page_title="Groq Connection Check", page_icon="🤖", layout="wide")
+init_session()
+auth_sidebar(get_current_user())
 
 st.title("Groq Connection Check")
 st.caption("Validate key and model via a small completion request")
@@ -36,4 +40,3 @@ if st.button("Run Live Groq Check", type="primary"):
     else:
         st.error(result.message)
     st.write(f"Response: `{result.text.strip()}`")
-

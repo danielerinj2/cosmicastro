@@ -5,8 +5,12 @@ import streamlit as st
 from app.config import AppConfig, DEFAULT_REQUIRED_TABLE_COLUMNS
 from app.infra.supabase_client import get_supabase_client
 from app.infra.supabase_probe import probe_connection, probe_required_columns, probe_tables
+from app.ui.components import auth_sidebar
+from app.ui.session import get_current_user, init_session
 
 st.set_page_config(page_title="Supabase Connection Check", page_icon="🧪", layout="wide")
+init_session()
+auth_sidebar(get_current_user())
 
 st.title("Supabase Connection Check")
 st.caption("Pre-approval database integration verification")
@@ -68,4 +72,3 @@ if run_checks:
         st.warning("One or more checks failed. Fix table names/columns/RLS and rerun.")
     else:
         st.success("All Supabase checks passed for configured tables and required columns.")
-

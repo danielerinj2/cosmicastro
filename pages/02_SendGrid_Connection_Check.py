@@ -4,8 +4,12 @@ import streamlit as st
 
 from app.config import AppConfig
 from app.infra.sendgrid_probe import probe_sendgrid_key
+from app.ui.components import auth_sidebar
+from app.ui.session import get_current_user, init_session
 
 st.set_page_config(page_title="SendGrid Connection Check", page_icon="📨", layout="wide")
+init_session()
+auth_sidebar(get_current_user())
 
 st.title("SendGrid Connection Check")
 st.caption("Validate API key and permissions without sending email")
@@ -47,4 +51,3 @@ if st.button("Run Live SendGrid Check", type="primary"):
     st.subheader("API Key Scopes")
     for scope in result.scopes:
         st.write(f"- {scope}")
-
