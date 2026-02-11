@@ -5,7 +5,7 @@ from typing import Any
 
 import streamlit as st
 
-from app.content.homepage_content import load_homepage_content
+from app.content.homepage_content import DEFAULT_HOMEPAGE_CONTENT, load_homepage_content
 from app.services.auth_service import AuthService
 from app.ui.components import auth_sidebar
 from app.ui.session import get_current_user, init_session
