@@ -1,7 +1,15 @@
 from __future__ import annotations
 
+import json
+from html import escape
+
 import streamlit as st
 
+from app.content.homepage_content import (
+    DEFAULT_HOMEPAGE_CONTENT,
+    load_homepage_content,
+    save_homepage_content,
+)
 from app.services.auth_service import AuthService
 from app.ui.components import auth_sidebar
 from app.ui.session import get_current_user, init_session
@@ -66,6 +74,124 @@ if reset_token:
                 st.error(result.message)
 
 daily_target = "pages/12_Daily_Horoscope.py" if user else "pages/04_Auth_Sign_In.py"
+homepage_content = load_homepage_content()
+
+if user:
+    with st.expander("Edit Homepage Content", expanded=False):
+        st.caption(
+            "Manual editor for homepage copy. Edit JSON and click Save. "
+            "Changes are saved to app/content/homepage_content.json."
+        )
+        raw_json = st.text_area(
+            "Homepage Content JSON",
+            value=json.dumps(homepage_content, ensure_ascii=True, indent=2),
+            height=420,
+            key="homepage_editor_json",
+        )
+        col_save, col_reset = st.columns(2)
+        with col_save:
+            if st.button("Save Homepage Content", key="save_homepage_content"):
+                try:
+                    parsed = json.loads(raw_json)
+                    if not isinstance(parsed, dict):
+                        raise ValueError("JSON root must be an object.")
+                    save_homepage_content(parsed)
+                    st.success("Homepage content saved.")
+                    st.rerun()
+                except Exception as exc:
+                    st.error(f"Could not save content: {exc}")
+        with col_reset:
+            if st.button("Reset To Default Content", key="reset_homepage_content"):
+                save_homepage_content(DEFAULT_HOMEPAGE_CONTENT)
+                st.success("Homepage content reset to defaults.")
+                st.rerun()
+
+hero = homepage_content.get("hero", {})
+hero_title = escape(str(hero.get("title", DEFAULT_HOMEPAGE_CONTENT["hero"]["title"])))
+hero_subtitle = escape(str(hero.get("subtitle", DEFAULT_HOMEPAGE_CONTENT["hero"]["subtitle"])))
+hero_cta = str(hero.get("cta_text", DEFAULT_HOMEPAGE_CONTENT["hero"]["cta_text"]))
+
+how_items = homepage_content.get("how_it_works", DEFAULT_HOMEPAGE_CONTENT["how_it_works"])
+if not isinstance(how_items, list):
+    how_items = DEFAULT_HOMEPAGE_CONTENT["how_it_works"]
+how_cards_html_parts: list[str] = []
+for idx, item in enumerate(how_items[:3], start=1):
+    if not isinstance(item, dict):
+        continue
+    step = escape(str(item.get("step", f"{idx:02d}")))
+    title = escape(str(item.get("title", f"Step {idx}")))
+    description = escape(str(item.get("description", "")))
+    how_cards_html_parts.append(
+        f"""
+        <div class="orbit-card">
+          <div class="orbit-step">{step}</div>
+          <h3>{title}</h3>
+          <p>{description}</p>
+        </div>
+        """
+    )
+how_cards_html = "".join(how_cards_html_parts)
+
+features = homepage_content.get("features", DEFAULT_HOMEPAGE_CONTENT["features"])
+if not isinstance(features, list):
+    features = DEFAULT_HOMEPAGE_CONTENT["features"]
+feature_blocks: list[str] = []
+for idx, item in enumerate(features):
+    if not isinstance(item, dict):
+        continue
+    alt_class = " alt" if idx % 2 == 1 else ""
+    label = escape(str(item.get("label", "Feature")))
+    headline = escape(str(item.get("headline", "Feature Title")))
+    body = escape(str(item.get("body", "")))
+    visual_title = escape(str(item.get("visual_title", "Details")))
+    visual_body = escape(str(item.get("visual_body", "")))
+    feature_blocks.append(
+        f"""
+        <div class="orbit-feature{alt_class}">
+          <div class="orbit-text">
+            <div class="orbit-label">{label}</div>
+            <h2>{headline}</h2>
+            <p>{body}</p>
+          </div>
+          <div class="orbit-visual">
+            <h4>{visual_title}</h4>
+            <p>{visual_body}</p>
+          </div>
+        </div>
+        """
+    )
+features_html = "".join(feature_blocks)
+
+chat_config = homepage_content.get("chat_preview", DEFAULT_HOMEPAGE_CONTENT["chat_preview"])
+chat_messages = chat_config.get("messages", DEFAULT_HOMEPAGE_CONTENT["chat_preview"]["messages"])
+if not isinstance(chat_messages, list):
+    chat_messages = DEFAULT_HOMEPAGE_CONTENT["chat_preview"]["messages"]
+chat_rows: list[str] = []
+for message in chat_messages[:8]:
+    if not isinstance(message, dict):
+        continue
+    role = str(message.get("role", "user")).lower()
+    text = escape(str(message.get("text", "")))
+    if role == "assistant":
+        chat_rows.append(
+            f"""
+            <div class="orbit-chat-row assistant">
+              <div class="orbit-assistant-wrap">
+                <span class="orbit-ai-icon"></span>
+                <div class="orbit-bubble assistant">{text}</div>
+              </div>
+            </div>
+            """
+        )
+    else:
+        chat_rows.append(
+            f"""
+            <div class="orbit-chat-row user">
+              <div class="orbit-bubble user">{text}</div>
+            </div>
+            """
+        )
+chat_html = "".join(chat_rows)
 
 st.markdown(
     """
@@ -279,11 +405,17 @@ st.markdown(
   }
 }
 </style>
+""",
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    f"""
 <div class="orbit-root">
   <section class="orbit-hero">
     <div class="orbit-container">
-      <h1>Your birth chart. Your personal astrologer.</h1>
-      <p>Orbit reads your complete natal chart and gives you real, personalized guidance - not generic horoscope fluff.</p>
+      <h1>{hero_title}</h1>
+      <p>{hero_subtitle}</p>
     </div>
   </section>
 </div>
@@ -294,120 +426,31 @@ st.markdown(
 st.markdown('<div class="orbit-cta-wrap">', unsafe_allow_html=True)
 left, center, right = st.columns([2.3, 2.4, 2.3])
 with center:
-    if st.button("Get Your Daily Prediction", key="hero_daily_prediction"):
+    if st.button(hero_cta, key="hero_daily_prediction"):
         st.switch_page(daily_target)
 st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown(
-    """
+    f"""
 <div class="orbit-root">
   <section class="orbit-section orbit-how">
     <div class="orbit-container">
       <div class="orbit-how-grid">
-        <div class="orbit-card">
-          <div class="orbit-step">01</div>
-          <h3>Enter Your Birth Details</h3>
-          <p>Date, time, and location are enough to build your precise chart.</p>
-        </div>
-        <div class="orbit-card">
-          <div class="orbit-step">02</div>
-          <h3>Get Your Full Chart</h3>
-          <p>Planets, houses, and aspects are mapped together in one coherent reading.</p>
-        </div>
-        <div class="orbit-card">
-          <div class="orbit-step">03</div>
-          <h3>Ask Anything</h3>
-          <p>Chat with your personal AI astrologer for direct guidance on real decisions.</p>
-        </div>
+        {how_cards_html}
       </div>
     </div>
   </section>
 
   <section class="orbit-section orbit-features">
     <div class="orbit-container">
-      <div class="orbit-feature">
-        <div class="orbit-text">
-          <div class="orbit-label">Daily</div>
-          <h2>Daily Personalized Horoscope</h2>
-          <p>Each reading is built from your natal chart and live transits so you get concrete, relevant guidance every day.</p>
-        </div>
-        <div class="orbit-visual">
-          <h4>Transit-Aware Daily Insight</h4>
-          <p>Designed for fast clarity: one grounded theme, relationship signal, career focus, and wellness recommendation.</p>
-        </div>
-      </div>
-
-      <div class="orbit-feature alt">
-        <div class="orbit-text">
-          <div class="orbit-label">Natal</div>
-          <h2>Birth Chart Analysis</h2>
-          <p>Orbit combines signs, houses, and aspects into one readable narrative so you can understand your core patterns and blind spots.</p>
-        </div>
-        <div class="orbit-visual">
-          <h4>Whole-Chart Interpretation</h4>
-          <p>No isolated placement blurbs. Your chart is interpreted as one system with meaningful connections.</p>
-        </div>
-      </div>
-
-      <div class="orbit-feature">
-        <div class="orbit-text">
-          <div class="orbit-label">Synastry</div>
-          <h2>Compatibility Matching</h2>
-          <p>Compare two charts across emotional flow, communication style, chemistry, long-term stability, and growth dynamics.</p>
-        </div>
-        <div class="orbit-visual">
-          <h4>Real Dynamic, Not A Score</h4>
-          <p>Get a dimensional read on where the connection is smooth, where it is tense, and what to do about it.</p>
-        </div>
-      </div>
-
-      <div class="orbit-feature alt">
-        <div class="orbit-text">
-          <div class="orbit-label">Conversation</div>
-          <h2>The Chatbot Astrologer</h2>
-          <p>Ask direct questions and get chart-grounded responses instantly. Orbit remembers your context and answers with practical detail.</p>
-        </div>
-        <div class="orbit-visual">
-          <h4>Context-Aware Guidance</h4>
-          <p>Career move, relationship tension, timing confusion - ask one question and get an actionable next step.</p>
-        </div>
-      </div>
-
-      <div class="orbit-feature">
-        <div class="orbit-text">
-          <div class="orbit-label">Long-Range</div>
-          <h2>Yearly Forecast</h2>
-          <p>See the year as a timeline of themes so you know when to push, when to pause, and where your focus will matter most.</p>
-        </div>
-        <div class="orbit-visual">
-          <h4>Month-by-Month Focus</h4>
-          <p>Track major activation periods and use them intentionally instead of reacting late.</p>
-        </div>
-      </div>
+      {features_html}
     </div>
   </section>
 
   <section class="orbit-section orbit-chat-wrap">
     <div class="orbit-container">
       <div class="orbit-chat-card">
-        <div class="orbit-chat-row user">
-          <div class="orbit-bubble user">I got offered a new job but something feels off. Should I take it?</div>
-        </div>
-        <div class="orbit-chat-row assistant">
-          <div class="orbit-assistant-wrap">
-            <span class="orbit-ai-icon"></span>
-            <div class="orbit-bubble assistant">Your 10th house ruler is being squared by transiting Saturn, which can create productive doubt around career moves. Saturn is asking for better terms, not automatic rejection.</div>
-          </div>
-        </div>
-        <div class="orbit-chat-row user">
-          <div class="orbit-bubble user">It seems rigid and I am worried I will lose momentum.</div>
-        </div>
-        <div class="orbit-chat-row assistant">
-          <div class="orbit-assistant-wrap">
-            <span class="orbit-ai-icon"></span>
-            <div class="orbit-bubble assistant">That tracks your chart pattern. Structure helps you, but monotony drains you. Counter-offer for flexibility first. If they cannot move, keep looking while this transit tightens your standards.</div>
-          </div>
-        </div>
+        {chat_html}
       </div>
     </div>
   </section>
