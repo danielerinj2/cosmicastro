@@ -135,13 +135,11 @@ for index, card in enumerate(how_cards[:3], start=1):
     title = _safe_text(card_dict.get("title"), f"Step {index}")
     description = _safe_text(card_dict.get("body"), "")
     how_cards_html_parts.append(
-        f"""
-        <div class="orbit-card">
-          <div class="orbit-step">{step}</div>
-          <h3>{title}</h3>
-          <p>{description}</p>
-        </div>
-        """
+        "<div class=\"orbit-card\">"
+        f"<div class=\"orbit-step\">{step}</div>"
+        f"<h3>{title}</h3>"
+        f"<p>{description}</p>"
+        "</div>"
     )
 how_cards_html = "".join(how_cards_html_parts)
 
