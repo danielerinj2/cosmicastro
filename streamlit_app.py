@@ -56,6 +56,11 @@ def _safe_text(value: Any, fallback: str) -> str:
     return escape(raw)
 
 
+def _looks_like_markup(text: str) -> bool:
+    lowered = text.lower()
+    return any(token in lowered for token in ("<div", "<h", "<p", "orbit-card", "orbit-step", "&lt;div"))
+
+
 # Backward + forward compatible token keys.
 verify_token = _query_value("vt") or _query_value("verify_token")
 reset_token = _query_value("rt") or _query_value("reset_token") or _query_value("token")
@@ -106,6 +111,12 @@ how = _as_dict(homepage_content.get("how_it_works"))
 how_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("how_it_works"))
 how_label = _safe_text(how.get("label"), str(how_default.get("label", "HOW IT WORKS")))
 how_cards = _as_list(how.get("cards")) or _as_list(how_default.get("cards"))
+if any(
+    _looks_like_markup(" ".join(str(card.get(k, "")) for k in ("step", "title", "body")))
+    for card in (card for card in how_cards if isinstance(card, dict))
+):
+    how_cards = _as_list(how_default.get("cards"))
+
 how_cards_html_parts: list[str] = []
 for index, card in enumerate(how_cards[:3], start=1):
     card_dict = _as_dict(card)
@@ -247,25 +258,25 @@ st.markdown(
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 96px 20px 22px 20px;
+  padding: 128px 20px 20px 20px;
 }
 .hero-title {
-  font-size: clamp(64px, 7vw, 82px);
-  margin-bottom: 28px;
+  font-size: 76px;
+  margin-bottom: 24px;
   font-weight: 500;
   color: #FFFFFF;
   line-height: 1.2;
 }
 .hero-description {
-  max-width: 740px;
+  max-width: 700px;
   margin: 0 auto;
-  line-height: 1.65;
+  line-height: 1.6;
   color: #9999AA;
   font-size: 17px;
 }
 .punchline {
   display: block;
-  margin-top: 22px;
+  margin-top: 20px;
   font-weight: 400;
   color: #FFFFFF;
 }
@@ -273,7 +284,7 @@ st.markdown(
   display: flex;
   justify-content: center;
 }
-[data-testid="stAppViewContainer"] .stButton > button[kind="primary"] {
+[data-testid="stAppViewContainer"] .stButton > button {
   font-size: 16px !important;
   font-weight: 500 !important;
   background: #FFFFFF !important;
@@ -281,8 +292,9 @@ st.markdown(
   border: 1px solid #FFFFFF !important;
   border-radius: 100px !important;
   padding: 16px 40px !important;
+  opacity: 1 !important;
 }
-[data-testid="stAppViewContainer"] .stButton > button[kind="primary"]:hover {
+[data-testid="stAppViewContainer"] .stButton > button:hover {
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
 }
 .orbit-final-cta .stButton > button {
@@ -496,11 +508,17 @@ st.markdown(
 
 @media (max-width: 980px) {
   .hero-title {
-    font-size: 46px;
+    font-size: 58px;
   }
   .orbit-how-grid {
     grid-template-columns: 1fr;
   }
+}
+.hero-title a,
+.hero-title + a,
+.hero-section a[aria-label*="link"],
+.hero-section .anchor-link {
+  display: none !important;
 }
 </style>
 """,
@@ -514,8 +532,8 @@ st.markdown(
     <div class="orbit-container">
       <h1 class="hero-title">{hero_title}</h1>
       <p class="hero-description">
-        {intro_p1} {intro_p2}
-        <span class="punchline">{intro_punch}</span>
+        Your horoscope said something about &#x27;new beginnings&#x27; and &#x27;trusting the process.&#x27; Cool. So did everyone else&#x27;s. That&#x27;s like diagnosing someone by looking at their shoes.
+        <span class="punchline">The universe doesn&#x27;t deal in vague predictions. Neither do we.</span>
       </p>
     </div>
   </section>
@@ -524,12 +542,12 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
 hero_col_left, hero_col_center, hero_col_right = st.columns([1, 1, 1])
 with hero_col_center:
     if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
         st.switch_page(daily_target)
-st.markdown("<div style='height:64px;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height:56px;'></div>", unsafe_allow_html=True)
 
 st.markdown(
     f"""
