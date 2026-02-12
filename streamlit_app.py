@@ -334,7 +334,7 @@ st.markdown(
   background: #111118;
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 16px;
-  padding: 56px 44px;
+  padding: 12px 14px 16px 14px;
 }
 .orbit-how-heading {
   font-size: 44px;
@@ -345,7 +345,7 @@ st.markdown(
   margin: 0;
 }
 .orbit-how-grid {
-  margin-top: 36px;
+  margin-top: 14px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
@@ -541,7 +541,7 @@ st.markdown(
     min-width: 280px !important;
   }
   .orbit-how-panel {
-    padding: 42px 22px;
+    padding: 10px 10px 12px 10px;
   }
   .orbit-how-heading {
     font-size: 34px;
@@ -553,6 +553,13 @@ st.markdown(
     font-size: 24px;
   }
 }
+.orbit-root a[aria-label*="Anchor"],
+.orbit-root a[aria-label*="anchor"],
+.orbit-root a[aria-label*="link"],
+.orbit-root .anchor-link,
+.orbit-root h1 a,
+.orbit-root h2 a,
+.orbit-root h3 a,
 .hero-title a,
 .hero-title + a,
 .hero-section a[aria-label*="link"],
