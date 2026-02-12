@@ -236,21 +236,24 @@ st.markdown(
   text-align: center;
   margin: 0 0 16px 0;
 }
+
+/* ── Hero ── */
 .orbit-hero-section {
   padding-top: 68px;
-  padding-bottom: 60px;
+  padding-bottom: 0;
   text-align: center;
 }
 .orbit-hero-section .orbit-h1 {
   margin: 0;
   font-size: 64px;
+  text-align: center;
 }
 .orbit-hero-section .orbit-h1 a {
   display: none !important;
 }
 .orbit-hero-subtitle {
   margin: 32px auto 0 auto;
-  max-width: 720px;
+  max-width: 680px;
   font-size: 20px;
   line-height: 1.65;
   color: #9999AA;
@@ -258,21 +261,30 @@ st.markdown(
   text-align: center;
 }
 .orbit-hero-punchline {
-  margin: 28px auto 0 auto;
-  max-width: 720px;
+  margin: 36px auto 0 auto;
+  max-width: 680px;
   font-size: 20px;
   line-height: 1.65;
   color: #FFFFFF;
   font-weight: 500;
   text-align: center;
 }
+
+/* ── Hero CTA button ── */
 .orbit-hero-cta {
   background: #0A0A0F;
-  margin-top: -20px;
+  padding-top: 48px;
   padding-bottom: 100px;
+  display: flex;
+  justify-content: center;
 }
-.orbit-final-cta {
-  margin-top: 40px;
+.orbit-hero-cta [data-testid="column"] {
+  display: flex;
+  justify-content: center;
+}
+.orbit-hero-cta .stButton {
+  display: flex;
+  justify-content: center;
 }
 .orbit-hero-cta .stButton > button,
 .orbit-final-cta .stButton > button {
@@ -283,11 +295,25 @@ st.markdown(
   border: 1px solid #FFFFFF !important;
   border-radius: 100px !important;
   padding: 16px 40px !important;
+  margin: 0 auto !important;
 }
 .orbit-hero-cta .stButton > button:hover,
 .orbit-final-cta .stButton > button:hover {
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
 }
+.orbit-final-cta {
+  margin-top: 40px;
+}
+.orbit-final-cta .stButton {
+  display: flex;
+  justify-content: center;
+}
+.orbit-final-cta [data-testid="column"] {
+  display: flex;
+  justify-content: center;
+}
+
+/* ── How it works ── */
 .orbit-how-section {
   background: #111118;
   padding: 100px 0;
@@ -319,6 +345,8 @@ st.markdown(
   font-size: 16px;
   margin: 0;
 }
+
+/* ── Feature sections ── */
 .orbit-feature-section {
   padding: 100px 0;
   text-align: center;
@@ -344,6 +372,8 @@ st.markdown(
   font-weight: 500;
   font-size: 18px;
 }
+
+/* ── Chat section ── */
 .orbit-chat-section {
   padding: 100px 0;
   text-align: center;
@@ -424,6 +454,8 @@ st.markdown(
   text-align: center;
   font-size: 16px;
 }
+
+/* ── Social proof ── */
 .orbit-social-section {
   background: #111118;
   padding: 80px 0;
@@ -449,6 +481,8 @@ st.markdown(
   font-size: 16px;
   font-weight: 300;
 }
+
+/* ── Closing ── */
 .orbit-closing-section {
   padding-top: 120px;
   padding-bottom: 140px;
@@ -464,6 +498,7 @@ st.markdown(
   color: #9999AA;
   font-weight: 300;
 }
+
 @media (max-width: 980px) {
   .orbit-hero-section .orbit-h1 {
     font-size: 46px;
