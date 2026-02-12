@@ -302,8 +302,8 @@ st.markdown(
   background: #FFFFFF !important;
   color: #000000 !important;
   border: 1px solid #FFFFFF !important;
-  border-radius: 100px !important;
-  padding: 16px 40px !important;
+  border-radius: 75px !important;
+  padding: 12px 30px !important;
   min-width: 320px !important;
   opacity: 1 !important;
 }
