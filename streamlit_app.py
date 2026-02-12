@@ -269,10 +269,10 @@ st.markdown(
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 112px 20px 0 20px;
+  padding: 60px 20px 0 20px;
 }
 .hero-title {
-  font-size: 76px;
+  font-size: 92px;
   margin-bottom: 24px;
   font-weight: 500;
   color: #FFFFFF;
