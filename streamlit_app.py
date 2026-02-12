@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from html import escape
 from typing import Any
 
@@ -48,9 +49,11 @@ def _as_list(value: Any) -> list[Any]:
 
 
 def _safe_text(value: Any, fallback: str) -> str:
-    if value is None:
-        return escape(fallback)
-    return escape(str(value))
+    raw = fallback if value is None else str(value)
+    # Guard against accidentally saved HTML snippets showing up as literal text.
+    raw = re.sub(r"<[^>]+>", " ", raw)
+    raw = " ".join(raw.split())
+    return escape(raw)
 
 
 # Backward + forward compatible token keys.
@@ -92,6 +95,12 @@ hero = _as_dict(homepage_content.get("hero"))
 hero_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("hero"))
 hero_title = _safe_text(hero.get("title"), str(hero_default.get("title", "Orbit AI")))
 hero_cta = str(hero.get("cta_text") or hero_default.get("cta_text") or "Get Your Daily Prediction")
+
+intro = _as_dict(homepage_content.get("intro"))
+intro_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("intro"))
+intro_p1 = _safe_text(intro.get("paragraph_1"), str(intro_default.get("paragraph_1", "")))
+intro_p2 = _safe_text(intro.get("paragraph_2"), str(intro_default.get("paragraph_2", "")))
+intro_punch = _safe_text(intro.get("punch_line"), str(intro_default.get("punch_line", "")))
 
 how = _as_dict(homepage_content.get("how_it_works"))
 how_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("how_it_works"))
@@ -238,32 +247,33 @@ st.markdown(
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 60px 20px;
+  padding: 96px 20px 22px 20px;
 }
 .hero-title {
-  font-size: 3.5rem;
-  margin-bottom: 24px;
+  font-size: clamp(64px, 7vw, 82px);
+  margin-bottom: 28px;
   font-weight: 500;
   color: #FFFFFF;
   line-height: 1.2;
 }
 .hero-description {
-  max-width: 700px;
+  max-width: 740px;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.65;
   color: #9999AA;
   font-size: 17px;
 }
 .punchline {
   display: block;
-  margin-top: 20px;
+  margin-top: 22px;
   font-weight: 400;
   color: #FFFFFF;
 }
-.hero-cta {
-  margin-top: 40px;
+[data-testid="stAppViewContainer"] .stButton {
+  display: flex;
+  justify-content: center;
 }
-.hero-cta .stButton > button {
+[data-testid="stAppViewContainer"] .stButton > button[kind="primary"] {
   font-size: 16px !important;
   font-weight: 500 !important;
   background: #FFFFFF !important;
@@ -272,7 +282,7 @@ st.markdown(
   border-radius: 100px !important;
   padding: 16px 40px !important;
 }
-.hero-cta .stButton > button:hover {
+[data-testid="stAppViewContainer"] .stButton > button[kind="primary"]:hover {
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
 }
 .orbit-final-cta .stButton > button {
@@ -504,8 +514,8 @@ st.markdown(
     <div class="orbit-container">
       <h1 class="hero-title">{hero_title}</h1>
       <p class="hero-description">
-        Your horoscope said something about &#x27;new beginnings&#x27; and &#x27;trusting the process.&#x27; Cool. So did everyone else&#x27;s. That&#x27;s like diagnosing someone by looking at their shoes.
-        <span class="punchline">The universe doesn&#x27;t deal in vague predictions. Neither do we.</span>
+        {intro_p1} {intro_p2}
+        <span class="punchline">{intro_punch}</span>
       </p>
     </div>
   </section>
@@ -514,12 +524,12 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown('<div class="hero-cta">', unsafe_allow_html=True)
-hero_col_left, hero_col_center, hero_col_right = st.columns([2.4, 2.2, 2.4])
+st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
+hero_col_left, hero_col_center, hero_col_right = st.columns([1, 1, 1])
 with hero_col_center:
-    if st.button(hero_cta, key="hero_daily_prediction"):
+    if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
         st.switch_page(daily_target)
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("<div style='height:64px;'></div>", unsafe_allow_html=True)
 
 st.markdown(
     f"""
@@ -608,6 +618,6 @@ st.markdown(
 st.markdown('<div class="orbit-final-cta">', unsafe_allow_html=True)
 final_col_left, final_col_center, final_col_right = st.columns([2.4, 2.2, 2.4])
 with final_col_center:
-    if st.button(closing_cta, key="closing_chatbot_cta"):
+    if st.button(closing_cta, key="closing_chatbot_cta", type="primary"):
         st.switch_page(chat_target)
 st.markdown("</div>", unsafe_allow_html=True)
