@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from html import escape
+from html import escape, unescape
 from typing import Any
 
 import streamlit as st
@@ -50,6 +50,7 @@ def _as_list(value: Any) -> list[Any]:
 
 def _safe_text(value: Any, fallback: str) -> str:
     raw = fallback if value is None else str(value)
+    raw = unescape(raw)
     # Guard against accidentally saved HTML snippets showing up as literal text.
     raw = re.sub(r"<[^>]+>", " ", raw)
     raw = " ".join(raw.split())
@@ -57,7 +58,7 @@ def _safe_text(value: Any, fallback: str) -> str:
 
 
 def _looks_like_markup(text: str) -> bool:
-    lowered = text.lower()
+    lowered = unescape(text).lower()
     return any(token in lowered for token in ("<div", "<h", "<p", "orbit-card", "orbit-step", "&lt;div"))
 
 
@@ -258,7 +259,7 @@ st.markdown(
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 128px 20px 20px 20px;
+  padding: 112px 20px 0 20px;
 }
 .hero-title {
   font-size: 76px;
@@ -268,11 +269,11 @@ st.markdown(
   line-height: 1.2;
 }
 .hero-description {
-  max-width: 700px;
+  max-width: 760px;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.62;
   color: #9999AA;
-  font-size: 17px;
+  font-size: 18px;
 }
 .punchline {
   display: block;
@@ -280,11 +281,15 @@ st.markdown(
   font-weight: 400;
   color: #FFFFFF;
 }
-[data-testid="stAppViewContainer"] .stButton {
+.hero-cta-wrap {
+  margin: 34px 0 68px 0;
+}
+[data-testid="stAppViewContainer"] .stButton,
+.hero-cta-wrap .stButton {
   display: flex;
   justify-content: center;
 }
-[data-testid="stAppViewContainer"] .stButton > button {
+.hero-cta-wrap .stButton > button {
   font-size: 16px !important;
   font-weight: 500 !important;
   background: #FFFFFF !important;
@@ -292,9 +297,23 @@ st.markdown(
   border: 1px solid #FFFFFF !important;
   border-radius: 100px !important;
   padding: 16px 40px !important;
+  min-width: 360px !important;
   opacity: 1 !important;
 }
-[data-testid="stAppViewContainer"] .stButton > button:hover {
+.hero-cta-wrap .stButton > button *,
+.hero-cta-wrap .stButton > button span,
+.hero-cta-wrap .stButton > button p {
+  color: #000000 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+.hero-cta-wrap .stButton > button:disabled,
+.hero-cta-wrap .stButton > button:disabled * {
+  color: #000000 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+.hero-cta-wrap .stButton > button:hover {
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
 }
 .orbit-final-cta .stButton > button {
@@ -306,6 +325,15 @@ st.markdown(
   border-radius: 100px !important;
   padding: 16px 40px !important;
   margin: 0 auto !important;
+}
+.orbit-final-cta .stButton > button *,
+.orbit-final-cta .stButton > button span,
+.orbit-final-cta .stButton > button p,
+.orbit-final-cta .stButton > button:disabled,
+.orbit-final-cta .stButton > button:disabled * {
+  color: #000000 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #000000 !important;
 }
 .orbit-final-cta .stButton > button:hover {
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
@@ -351,6 +379,19 @@ st.markdown(
 .orbit-card .orbit-body {
   font-size: 16px;
   margin: 0;
+}
+.orbit-card h3 {
+  font-size: 22px;
+  margin: 0 0 14px 0;
+  font-weight: 500;
+  color: #FFFFFF;
+}
+.orbit-card p {
+  font-size: 16px;
+  margin: 0;
+  line-height: 1.65;
+  color: #9999AA;
+  font-weight: 300;
 }
 
 /* ── Feature sections ── */
@@ -510,6 +551,13 @@ st.markdown(
   .hero-title {
     font-size: 58px;
   }
+  .hero-description {
+    max-width: 92vw;
+    font-size: 17px;
+  }
+  .hero-cta-wrap .stButton > button {
+    min-width: 280px !important;
+  }
   .orbit-how-grid {
     grid-template-columns: 1fr;
   }
@@ -542,12 +590,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown("<div style='height:28px;'></div>", unsafe_allow_html=True)
-hero_col_left, hero_col_center, hero_col_right = st.columns([1, 1, 1])
-with hero_col_center:
-    if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
-        st.switch_page(daily_target)
-st.markdown("<div style='height:56px;'></div>", unsafe_allow_html=True)
+st.markdown('<div class="hero-cta-wrap">', unsafe_allow_html=True)
+if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
+    st.switch_page(daily_target)
+st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown(
     f"""

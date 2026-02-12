@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import json
+import re
 from copy import deepcopy
+from html import unescape
 from pathlib import Path
 from typing import Any
 
 CONTENT_PATH = Path(__file__).resolve().parent / "homepage_content.json"
+_HTML_TAG_RE = re.compile(r"<[^>]+>")
+_MARKUP_TOKENS = ("<div", "<p", "<h", "orbit-card", "orbit-step", "&lt;div", "&lt;/")
 
 DEFAULT_HOMEPAGE_CONTENT: dict[str, Any] = {
     "hero": {
@@ -159,6 +163,100 @@ def _merge_defaults(base: dict[str, Any], current: dict[str, Any]) -> dict[str, 
     return merged
 
 
+def _looks_like_markup(value: Any) -> bool:
+    if not isinstance(value, str):
+        return False
+    lowered = unescape(value).lower()
+    return any(token in lowered for token in _MARKUP_TOKENS)
+
+
+def _sanitize_scalar(value: Any) -> Any:
+    if not isinstance(value, str):
+        return value
+    cleaned = unescape(value)
+    cleaned = _HTML_TAG_RE.sub(" ", cleaned)
+    cleaned = " ".join(cleaned.split())
+    return cleaned
+
+
+def _sanitize_content(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {key: _sanitize_content(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_sanitize_content(item) for item in value]
+    return _sanitize_scalar(value)
+
+
+def _normalize_how_cards(content: dict[str, Any]) -> None:
+    section = content.get("how_it_works")
+    if not isinstance(section, dict):
+        content["how_it_works"] = deepcopy(DEFAULT_HOMEPAGE_CONTENT["how_it_works"])
+        return
+
+    cards = section.get("cards")
+    default_cards = deepcopy(DEFAULT_HOMEPAGE_CONTENT["how_it_works"]["cards"])
+    if not isinstance(cards, list):
+        section["cards"] = default_cards
+        return
+
+    if any(
+        _looks_like_markup(
+            " ".join(
+                str(card.get(field, ""))
+                for field in ("step", "title", "body")
+            )
+        )
+        for card in cards
+        if isinstance(card, dict)
+    ):
+        section["cards"] = default_cards
+        return
+
+    normalized_cards: list[dict[str, str]] = []
+    for idx in range(3):
+        default_card = default_cards[idx]
+        card = cards[idx] if idx < len(cards) and isinstance(cards[idx], dict) else {}
+        step = str(card.get("step", default_card["step"])).strip() or default_card["step"]
+        title = str(card.get("title", default_card["title"])).strip() or default_card["title"]
+        body = str(card.get("body", default_card["body"])).strip() or default_card["body"]
+        normalized_cards.append({"step": step, "title": title, "body": body})
+    section["cards"] = normalized_cards
+
+
+def _normalize_chat_messages(content: dict[str, Any]) -> None:
+    section = content.get("chatbot_feature")
+    if not isinstance(section, dict):
+        content["chatbot_feature"] = deepcopy(DEFAULT_HOMEPAGE_CONTENT["chatbot_feature"])
+        return
+
+    defaults = deepcopy(DEFAULT_HOMEPAGE_CONTENT["chatbot_feature"]["messages"])
+    messages = section.get("messages")
+    if not isinstance(messages, list):
+        section["messages"] = defaults
+        return
+
+    normalized_messages: list[dict[str, str]] = []
+    for idx in range(4):
+        default_message = defaults[idx]
+        message = messages[idx] if idx < len(messages) and isinstance(messages[idx], dict) else {}
+        role = str(message.get("role", default_message["role"])).strip().lower()
+        if role not in {"user", "assistant"}:
+            role = default_message["role"]
+        text = str(message.get("text", default_message["text"])).strip() or default_message["text"]
+        normalized_messages.append({"role": role, "text": text})
+    section["messages"] = normalized_messages
+
+
+def _normalize_content(content: dict[str, Any]) -> dict[str, Any]:
+    merged = _merge_defaults(DEFAULT_HOMEPAGE_CONTENT, content)
+    sanitized = _sanitize_content(merged)
+    if not isinstance(sanitized, dict):
+        return deepcopy(DEFAULT_HOMEPAGE_CONTENT)
+    _normalize_how_cards(sanitized)
+    _normalize_chat_messages(sanitized)
+    return sanitized
+
+
 def load_homepage_content() -> dict[str, Any]:
     if not CONTENT_PATH.exists():
         return deepcopy(DEFAULT_HOMEPAGE_CONTENT)
@@ -168,12 +266,18 @@ def load_homepage_content() -> dict[str, Any]:
         return deepcopy(DEFAULT_HOMEPAGE_CONTENT)
     if not isinstance(parsed, dict):
         return deepcopy(DEFAULT_HOMEPAGE_CONTENT)
-    return _merge_defaults(DEFAULT_HOMEPAGE_CONTENT, parsed)
+    normalized = _normalize_content(parsed)
+    if normalized != parsed:
+        save_homepage_content(normalized)
+    return normalized
 
 
 def save_homepage_content(content: dict[str, Any]) -> None:
+    if not isinstance(content, dict):
+        content = {}
+    normalized = _normalize_content(content)
     CONTENT_PATH.parent.mkdir(parents=True, exist_ok=True)
     CONTENT_PATH.write_text(
-        json.dumps(content, ensure_ascii=True, indent=2),
+        json.dumps(normalized, ensure_ascii=True, indent=2),
         encoding="utf-8",
     )

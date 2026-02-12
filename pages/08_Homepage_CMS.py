@@ -15,6 +15,7 @@ app_header("Homepage CMS", "Edit landing-page copy with form fields and publish 
 content = load_homepage_content()
 
 st.info("This updates the landing page content used by `streamlit_app.py`.")
+st.caption("Safety: pasted HTML snippets are automatically sanitized on save to prevent broken homepage cards.")
 st.page_link("streamlit_app.py", label="Open Homepage Preview", icon="🏠")
 
 hero = content["hero"]
