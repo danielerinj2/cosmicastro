@@ -306,7 +306,7 @@ st.markdown(
   padding: 9px 24px !important;
   min-width: 320px !important;
   opacity: 1 !important;
-  display: inline-flex !important;
+  display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   margin-left: auto !important;
@@ -597,8 +597,10 @@ st.markdown(
 )
 
 st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
-if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
-    st.switch_page(daily_target)
+hero_col_left, hero_col_center, hero_col_right = st.columns([1, 1, 1])
+with hero_col_center:
+    if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
+        st.switch_page(daily_target)
 st.markdown("<div style='height:0;'></div>", unsafe_allow_html=True)
 
 st.markdown(
