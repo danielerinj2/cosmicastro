@@ -303,8 +303,8 @@ st.markdown(
   color: #000000 !important;
   border: 1px solid #FFFFFF !important;
   border-radius: 56px !important;
-  padding: 9px 22px !important;
-  min-width: 240px !important;
+  padding: 9px 24px !important;
+  min-width: 320px !important;
   opacity: 1 !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -312,6 +312,9 @@ st.markdown(
   margin-left: auto !important;
   margin-right: auto !important;
   text-align: center !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
 }
 [data-testid="stAppViewContainer"] .stButton > button[kind="primary"] *,
 [data-testid="stAppViewContainer"] .stButton > button[kind="primary"] span,
@@ -336,7 +339,7 @@ st.markdown(
   background: #111118;
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 16px;
-  padding: 12px 14px 12px 14px;
+  padding: 14px;
 }
 .orbit-how-heading {
   font-size: 44px;
@@ -351,13 +354,17 @@ st.markdown(
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
-  align-items: start;
+  align-items: stretch;
 }
 .orbit-card {
   background: #161622;
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   padding: 36px 28px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   text-align: center;
 }
 .orbit-card h3 {
@@ -590,10 +597,8 @@ st.markdown(
 )
 
 st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
-hero_col_left, hero_col_center, hero_col_right = st.columns([1, 1, 1])
-with hero_col_center:
-    if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
-        st.switch_page(daily_target)
+if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
+    st.switch_page(daily_target)
 st.markdown("<div style='height:0;'></div>", unsafe_allow_html=True)
 
 st.markdown(
