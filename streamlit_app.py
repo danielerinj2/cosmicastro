@@ -269,7 +269,7 @@ st.markdown(
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 5px 20px 0 20px;
+  padding: 1px 20px 0 20px;
 }
 .hero-title {
   font-size: 120px;
