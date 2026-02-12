@@ -223,6 +223,23 @@ def _normalize_how_cards(content: dict[str, Any]) -> None:
     section["cards"] = normalized_cards
 
 
+def _raw_how_cards_are_corrupt(raw_content: dict[str, Any]) -> bool:
+    section = raw_content.get("how_it_works")
+    if not isinstance(section, dict):
+        return True
+    cards = section.get("cards")
+    if not isinstance(cards, list):
+        return True
+    for card in cards:
+        if not isinstance(card, dict):
+            return True
+        raw_blob = " ".join(str(card.get(field, "")) for field in ("step", "title", "body"))
+        lowered = unescape(raw_blob).lower()
+        if any(token in lowered for token in ("<div class=\"orbit-card\"", "<div class='orbit-card'", "<div class=", "&lt;div class=")):
+            return True
+    return False
+
+
 def _normalize_chat_messages(content: dict[str, Any]) -> None:
     section = content.get("chatbot_feature")
     if not isinstance(section, dict):
@@ -249,6 +266,8 @@ def _normalize_chat_messages(content: dict[str, Any]) -> None:
 
 def _normalize_content(content: dict[str, Any]) -> dict[str, Any]:
     merged = _merge_defaults(DEFAULT_HOMEPAGE_CONTENT, content)
+    if _raw_how_cards_are_corrupt(content):
+        merged["how_it_works"] = deepcopy(DEFAULT_HOMEPAGE_CONTENT["how_it_works"])
     sanitized = _sanitize_content(merged)
     if not isinstance(sanitized, dict):
         return deepcopy(DEFAULT_HOMEPAGE_CONTENT)

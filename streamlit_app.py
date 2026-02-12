@@ -6,7 +6,7 @@ from typing import Any
 
 import streamlit as st
 
-from app.content.homepage_content import DEFAULT_HOMEPAGE_CONTENT, load_homepage_content
+from app.content.homepage_content import DEFAULT_HOMEPAGE_CONTENT, load_homepage_content, save_homepage_content
 from app.services.auth_service import AuthService
 from app.ui.components import auth_sidebar
 from app.ui.session import get_current_user, init_session
@@ -112,11 +112,21 @@ how = _as_dict(homepage_content.get("how_it_works"))
 how_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("how_it_works"))
 how_label = _safe_text(how.get("label"), str(how_default.get("label", "HOW IT WORKS")))
 how_cards = _as_list(how.get("cards")) or _as_list(how_default.get("cards"))
-if any(
+corrupt_how_cards = any(
     _looks_like_markup(" ".join(str(card.get(k, "")) for k in ("step", "title", "body")))
+    or any(
+        token in unescape(" ".join(str(card.get(k, "")) for k in ("step", "title", "body"))).lower()
+        for token in ("<div class=", "&lt;div class=", "orbit-card", "orbit-step")
+    )
     for card in (card for card in how_cards if isinstance(card, dict))
-):
+)
+if corrupt_how_cards:
     how_cards = _as_list(how_default.get("cards"))
+    fixed_content = dict(homepage_content)
+    fixed_how = _as_dict(fixed_content.get("how_it_works"))
+    fixed_how["cards"] = how_cards
+    fixed_content["how_it_works"] = fixed_how
+    save_homepage_content(fixed_content)
 
 how_cards_html_parts: list[str] = []
 for index, card in enumerate(how_cards[:3], start=1):
@@ -281,15 +291,11 @@ st.markdown(
   font-weight: 400;
   color: #FFFFFF;
 }
-.hero-cta-wrap {
-  margin: 34px 0 68px 0;
-}
-[data-testid="stAppViewContainer"] .stButton,
-.hero-cta-wrap .stButton {
+[data-testid="stAppViewContainer"] .stButton {
   display: flex;
   justify-content: center;
 }
-.hero-cta-wrap .stButton > button {
+[data-testid="stAppViewContainer"] .stButton > button[kind="primary"] {
   font-size: 16px !important;
   font-weight: 500 !important;
   background: #FFFFFF !important;
@@ -297,57 +303,24 @@ st.markdown(
   border: 1px solid #FFFFFF !important;
   border-radius: 100px !important;
   padding: 16px 40px !important;
-  min-width: 360px !important;
+  min-width: 320px !important;
   opacity: 1 !important;
 }
-.hero-cta-wrap .stButton > button *,
-.hero-cta-wrap .stButton > button span,
-.hero-cta-wrap .stButton > button p {
+[data-testid="stAppViewContainer"] .stButton > button[kind="primary"] *,
+[data-testid="stAppViewContainer"] .stButton > button[kind="primary"] span,
+[data-testid="stAppViewContainer"] .stButton > button[kind="primary"] p {
   color: #000000 !important;
   opacity: 1 !important;
   -webkit-text-fill-color: #000000 !important;
 }
-.hero-cta-wrap .stButton > button:disabled,
-.hero-cta-wrap .stButton > button:disabled * {
+[data-testid="stAppViewContainer"] .stButton > button[kind="primary"]:disabled,
+[data-testid="stAppViewContainer"] .stButton > button[kind="primary"]:disabled * {
   color: #000000 !important;
   opacity: 1 !important;
   -webkit-text-fill-color: #000000 !important;
 }
-.hero-cta-wrap .stButton > button:hover {
+[data-testid="stAppViewContainer"] .stButton > button[kind="primary"]:hover {
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
-}
-.orbit-final-cta .stButton > button {
-  font-size: 16px !important;
-  font-weight: 500 !important;
-  background: #FFFFFF !important;
-  color: #000000 !important;
-  border: 1px solid #FFFFFF !important;
-  border-radius: 100px !important;
-  padding: 16px 40px !important;
-  margin: 0 auto !important;
-}
-.orbit-final-cta .stButton > button *,
-.orbit-final-cta .stButton > button span,
-.orbit-final-cta .stButton > button p,
-.orbit-final-cta .stButton > button:disabled,
-.orbit-final-cta .stButton > button:disabled * {
-  color: #000000 !important;
-  opacity: 1 !important;
-  -webkit-text-fill-color: #000000 !important;
-}
-.orbit-final-cta .stButton > button:hover {
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
-}
-.orbit-final-cta {
-  margin-top: 40px;
-}
-.orbit-final-cta .stButton {
-  display: flex;
-  justify-content: center;
-}
-.orbit-final-cta [data-testid="column"] {
-  display: flex;
-  justify-content: center;
 }
 .orbit-how-section {
   background: #111118;
@@ -555,7 +528,7 @@ st.markdown(
     max-width: 92vw;
     font-size: 17px;
   }
-  .hero-cta-wrap .stButton > button {
+  [data-testid="stAppViewContainer"] .stButton > button[kind="primary"] {
     min-width: 280px !important;
   }
   .orbit-how-grid {
@@ -590,10 +563,12 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown('<div class="hero-cta-wrap">', unsafe_allow_html=True)
-if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
-    st.switch_page(daily_target)
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
+hero_col_left, hero_col_center, hero_col_right = st.columns([1.2, 1.0, 1.2])
+with hero_col_center:
+    if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
+        st.switch_page(daily_target)
+st.markdown("<div style='height:52px;'></div>", unsafe_allow_html=True)
 
 st.markdown(
     f"""
@@ -679,9 +654,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown('<div class="orbit-final-cta">', unsafe_allow_html=True)
 final_col_left, final_col_center, final_col_right = st.columns([2.4, 2.2, 2.4])
 with final_col_center:
     if st.button(closing_cta, key="closing_chatbot_cta", type="primary"):
         st.switch_page(chat_target)
-st.markdown("</div>", unsafe_allow_html=True)
