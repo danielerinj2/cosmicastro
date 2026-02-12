@@ -293,8 +293,7 @@ st.markdown(
   color: #FFFFFF;
 }
 [data-testid="stAppViewContainer"] .stButton {
-  display: flex;
-  justify-content: center;
+  display: block;
   width: 100%;
 }
 [data-testid="stAppViewContainer"] .stButton > button[kind="primary"] {
@@ -307,9 +306,12 @@ st.markdown(
   padding: 9px 22px !important;
   min-width: 240px !important;
   opacity: 1 !important;
-  display: block !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   margin-left: auto !important;
   margin-right: auto !important;
+  text-align: center !important;
 }
 [data-testid="stAppViewContainer"] .stButton > button[kind="primary"] *,
 [data-testid="stAppViewContainer"] .stButton > button[kind="primary"] span,
@@ -349,14 +351,13 @@ st.markdown(
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
-  align-items: stretch;
+  align-items: start;
 }
 .orbit-card {
   background: #161622;
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   padding: 36px 28px;
-  height: 100%;
   text-align: center;
 }
 .orbit-card h3 {
@@ -589,7 +590,7 @@ st.markdown(
 )
 
 st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
-hero_col_left, hero_col_center, hero_col_right = st.columns([1.2, 1.0, 1.2])
+hero_col_left, hero_col_center, hero_col_right = st.columns([1, 1, 1])
 with hero_col_center:
     if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
         st.switch_page(daily_target)
