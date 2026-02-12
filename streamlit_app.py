@@ -389,6 +389,9 @@ st.markdown(
   padding: 100px 0;
   text-align: center;
 }
+.orbit-feature-daily {
+  padding-top: 36px;
+}
 .orbit-feature-section .orbit-copy {
   max-width: 720px;
   margin: 0 auto;
@@ -409,6 +412,15 @@ st.markdown(
   color: #FFFFFF;
   font-weight: 500;
   font-size: 18px;
+}
+.orbit-feature-daily .orbit-label {
+  margin: 0 0 24px 0;
+}
+.orbit-feature-daily .orbit-h2 {
+  margin: 0;
+}
+.orbit-feature-daily .orbit-body {
+  margin: 24px 0 0 0;
 }
 
 /* ── Chat section ── */
@@ -617,7 +629,7 @@ st.markdown(
     </div>
   </section>
 
-  <section class="orbit-feature-section">
+  <section class="orbit-feature-section orbit-feature-daily">
     <div class="orbit-container orbit-copy">
       <p class="orbit-label">{daily_label}</p>
       <h2 class="orbit-h2">{daily_title}</h2>
