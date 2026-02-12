@@ -6,7 +6,7 @@ from typing import Any
 
 import streamlit as st
 
-from app.content.homepage_content import DEFAULT_HOMEPAGE_CONTENT, load_homepage_content, save_homepage_content
+from app.content.homepage_content import DEFAULT_HOMEPAGE_CONTENT, load_homepage_content
 from app.services.auth_service import AuthService
 from app.ui.components import auth_sidebar
 from app.ui.session import get_current_user, init_session
@@ -108,35 +108,37 @@ intro_p1 = _safe_text(intro.get("paragraph_1"), str(intro_default.get("paragraph
 intro_p2 = _safe_text(intro.get("paragraph_2"), str(intro_default.get("paragraph_2", "")))
 intro_punch = _safe_text(intro.get("punch_line"), str(intro_default.get("punch_line", "")))
 
-how = _as_dict(homepage_content.get("how_it_works"))
-how_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("how_it_works"))
-how_label = _safe_text(how.get("label"), str(how_default.get("label", "HOW IT WORKS")))
-how_cards = _as_list(how.get("cards")) or _as_list(how_default.get("cards"))
-corrupt_how_cards = any(
-    _looks_like_markup(" ".join(str(card.get(k, "")) for k in ("step", "title", "body")))
-    or any(
-        token in unescape(" ".join(str(card.get(k, "")) for k in ("step", "title", "body"))).lower()
-        for token in ("<div class=", "&lt;div class=", "orbit-card", "orbit-step")
-    )
-    for card in (card for card in how_cards if isinstance(card, dict))
-)
-if corrupt_how_cards:
-    how_cards = _as_list(how_default.get("cards"))
-    fixed_content = dict(homepage_content)
-    fixed_how = _as_dict(fixed_content.get("how_it_works"))
-    fixed_how["cards"] = how_cards
-    fixed_content["how_it_works"] = fixed_how
-    save_homepage_content(fixed_content)
+inside_orbit_heading = "Inside Orbit"
+inside_orbit_cards = [
+    {
+        "title": "\"Give us three facts about your birth.\"",
+        "body": (
+            "Date. Time. Place. That's it. From those three data points, we map the exact sky above you "
+            "the moment you arrived. No quizzes. No personality tests. No guessing."
+        ),
+    },
+    {
+        "title": "\"Get a reading that couldn't belong to anyone else.\"",
+        "body": (
+            "Most horoscopes are written for one-twelfth of the human population at a time. "
+            "Yours is written for you; based on your actual chart, your actual transits, right now."
+        ),
+    },
+    {
+        "title": "\"Ask it anything you'd ask at 2 a.m.\"",
+        "body": (
+            "Career crossroads. A relationship that doesn't add up. That restless feeling you can't explain. "
+            "Talk to Orbit the way you'd talk to someone who already knows your whole story; because it does."
+        ),
+    },
+]
 
 how_cards_html_parts: list[str] = []
-for index, card in enumerate(how_cards[:3], start=1):
-    card_dict = _as_dict(card)
-    step = _safe_text(card_dict.get("step"), f"{index:02d}")
-    title = _safe_text(card_dict.get("title"), f"Step {index}")
-    description = _safe_text(card_dict.get("body"), "")
+for card in inside_orbit_cards:
+    title = _safe_text(card.get("title"), "")
+    description = _safe_text(card.get("body"), "")
     how_cards_html_parts.append(
         "<div class=\"orbit-card\">"
-        f"<div class=\"orbit-step\">{step}</div>"
         f"<h3>{title}</h3>"
         f"<p>{description}</p>"
         "</div>"
@@ -326,41 +328,42 @@ st.markdown(
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
 }
 .orbit-how-section {
+  padding: 100px 0 0 0;
+}
+.orbit-how-panel {
   background: #111118;
-  padding: 100px 0;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  padding: 56px 44px;
+}
+.orbit-how-heading {
+  font-size: 44px;
+  font-weight: 500;
+  color: #FFFFFF;
+  line-height: 1.2;
+  text-align: center;
+  margin: 0;
 }
 .orbit-how-grid {
-  margin-top: 28px;
+  margin-top: 36px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
+  align-items: stretch;
 }
 .orbit-card {
   background: #161622;
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  padding: 44px;
-}
-.orbit-step {
-  font-size: 48px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.03);
-  line-height: 1;
-  margin-bottom: 22px;
-}
-.orbit-card .orbit-h3 {
-  font-size: 22px;
-  margin: 0 0 14px 0;
-}
-.orbit-card .orbit-body {
-  font-size: 16px;
-  margin: 0;
+  padding: 36px 28px;
+  height: 100%;
 }
 .orbit-card h3 {
-  font-size: 22px;
-  margin: 0 0 14px 0;
+  font-size: 27px;
+  margin: 0 0 16px 0;
   font-weight: 500;
   color: #FFFFFF;
+  line-height: 1.3;
 }
 .orbit-card p {
   font-size: 16px;
@@ -534,8 +537,17 @@ st.markdown(
   [data-testid="stAppViewContainer"] .stButton > button[kind="primary"] {
     min-width: 280px !important;
   }
+  .orbit-how-panel {
+    padding: 42px 22px;
+  }
+  .orbit-how-heading {
+    font-size: 34px;
+  }
   .orbit-how-grid {
     grid-template-columns: 1fr;
+  }
+  .orbit-card h3 {
+    font-size: 24px;
   }
 }
 .hero-title a,
@@ -578,9 +590,11 @@ st.markdown(
 <div class="orbit-root">
   <section class="orbit-how-section">
     <div class="orbit-container">
-      <p class="orbit-label">{how_label}</p>
-      <div class="orbit-how-grid">
-        {how_cards_html}
+      <div class="orbit-how-panel">
+        <h2 class="orbit-how-heading">{inside_orbit_heading}</h2>
+        <div class="orbit-how-grid">
+          {how_cards_html}
+        </div>
       </div>
     </div>
   </section>
