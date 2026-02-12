@@ -244,13 +244,16 @@ st.markdown(
   margin: 0 0 16px 0;
 }
 .orbit-hero-section {
-  padding-top: 140px;
+  padding-top: 116px;
   padding-bottom: 100px;
   text-align: center;
 }
 .orbit-hero-section .orbit-h1 {
   margin: 0;
   font-size: 64px;
+}
+.orbit-hero-section .orbit-h1 a {
+  display: none !important;
 }
 .orbit-hero-section .orbit-subheadline {
   margin: 32px auto 0 auto;
