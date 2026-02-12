@@ -295,6 +295,7 @@ st.markdown(
 [data-testid="stAppViewContainer"] .stButton {
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 [data-testid="stAppViewContainer"] .stButton > button[kind="primary"] {
   font-size: 16px !important;
@@ -306,6 +307,9 @@ st.markdown(
   padding: 9px 22px !important;
   min-width: 240px !important;
   opacity: 1 !important;
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 [data-testid="stAppViewContainer"] .stButton > button[kind="primary"] *,
 [data-testid="stAppViewContainer"] .stButton > button[kind="primary"] span,
