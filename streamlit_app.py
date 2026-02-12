@@ -94,14 +94,7 @@ if user:
 hero = _as_dict(homepage_content.get("hero"))
 hero_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("hero"))
 hero_title = _safe_text(hero.get("title"), str(hero_default.get("title", "Orbit AI")))
-hero_subtitle = _safe_text(hero.get("subtitle"), str(hero_default.get("subtitle", "")))
 hero_cta = str(hero.get("cta_text") or hero_default.get("cta_text") or "Get Your Daily Prediction")
-
-intro = _as_dict(homepage_content.get("intro"))
-intro_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("intro"))
-intro_p1 = _safe_text(intro.get("paragraph_1"), str(intro_default.get("paragraph_1", "")))
-intro_p2 = _safe_text(intro.get("paragraph_2"), str(intro_default.get("paragraph_2", "")))
-intro_punch = _safe_text(intro.get("punch_line"), str(intro_default.get("punch_line", "")))
 
 how = _as_dict(homepage_content.get("how_it_works"))
 how_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("how_it_works"))
@@ -244,8 +237,8 @@ st.markdown(
   margin: 0 0 16px 0;
 }
 .orbit-hero-section {
-  padding-top: 116px;
-  padding-bottom: 100px;
+  padding-top: 68px;
+  padding-bottom: 60px;
   text-align: center;
 }
 .orbit-hero-section .orbit-h1 {
@@ -255,14 +248,27 @@ st.markdown(
 .orbit-hero-section .orbit-h1 a {
   display: none !important;
 }
-.orbit-hero-section .orbit-subheadline {
+.orbit-hero-subtitle {
   margin: 32px auto 0 auto;
-  max-width: 680px;
+  max-width: 720px;
   font-size: 20px;
+  line-height: 1.65;
+  color: #9999AA;
+  font-weight: 300;
+  text-align: center;
+}
+.orbit-hero-punchline {
+  margin: 28px auto 0 auto;
+  max-width: 720px;
+  font-size: 20px;
+  line-height: 1.65;
+  color: #FFFFFF;
+  font-weight: 500;
+  text-align: center;
 }
 .orbit-hero-cta {
   background: #0A0A0F;
-  margin-top: -60px;
+  margin-top: -20px;
   padding-bottom: 100px;
 }
 .orbit-final-cta {
@@ -281,24 +287,6 @@ st.markdown(
 .orbit-hero-cta .stButton > button:hover,
 .orbit-final-cta .stButton > button:hover {
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
-}
-.orbit-intro-section {
-  padding: 80px 0;
-  text-align: center;
-}
-.orbit-intro-section .orbit-copy {
-  max-width: 720px;
-  margin: 0 auto;
-}
-.orbit-intro-section p {
-  font-size: 17px;
-  margin: 0 0 20px 0;
-}
-.orbit-intro-section .orbit-punch {
-  margin-top: 24px;
-  font-size: 20px;
-  color: #FFFFFF;
-  font-weight: 500;
 }
 .orbit-how-section {
   background: #111118;
@@ -495,7 +483,8 @@ st.markdown(
   <section class="orbit-hero-section">
     <div class="orbit-container">
       <h1 class="orbit-h1">{hero_title}</h1>
-      <h2 class="orbit-subheadline orbit-body">{hero_subtitle}</h2>
+      <p class="orbit-hero-subtitle">Your horoscope said something about &#x27;new beginnings&#x27; and &#x27;trusting the process.&#x27; Cool. So did everyone else&#x27;s. That&#x27;s like diagnosing someone by looking at their shoes.</p>
+      <p class="orbit-hero-punchline">The universe doesn&#x27;t deal in vague predictions. Neither do we.</p>
     </div>
   </section>
 </div>
@@ -513,14 +502,6 @@ st.markdown("</div>", unsafe_allow_html=True)
 st.markdown(
     f"""
 <div class="orbit-root">
-  <section class="orbit-intro-section">
-    <div class="orbit-container orbit-copy">
-      <p class="orbit-body">{intro_p1}</p>
-      <p class="orbit-body">{intro_p2}</p>
-      <p class="orbit-punch">{intro_punch}</p>
-    </div>
-  </section>
-
   <section class="orbit-how-section">
     <div class="orbit-container">
       <p class="orbit-label">{how_label}</p>
