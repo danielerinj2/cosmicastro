@@ -111,21 +111,21 @@ intro_punch = _safe_text(intro.get("punch_line"), str(intro_default.get("punch_l
 inside_orbit_heading = "Inside Orbit"
 inside_orbit_cards = [
     {
-        "title": "Give us three facts about your birth.",
+        "title": "Give us three facts about your birth",
         "body": (
             "Date. Time. Place. That's it. From those three data points, we map the exact sky above you "
             "the moment you arrived. No quizzes. No personality tests. No guessing."
         ),
     },
     {
-        "title": "Get a reading that couldn't belong to anyone else.",
+        "title": "Get a reading that couldn't belong to anyone else",
         "body": (
             "Most horoscopes are written for one-twelfth of the human population at a time. "
             "Yours is written for you; based on your actual chart, your actual transits, right now."
         ),
     },
     {
-        "title": "Ask it anything you'd ask at 2 a.m.",
+        "title": "Still Curious? I'm on speed dial",
         "body": (
             "Career crossroads. A relationship that doesn't add up. That restless feeling you can't explain. "
             "Talk to Orbit the way you'd talk to someone who already knows your whole story; because it does."
@@ -328,7 +328,7 @@ st.markdown(
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
 }
 .orbit-how-section {
-  padding: 20px 0 0 0;
+  padding: 0;
 }
 .orbit-how-panel {
   background: #111118;
@@ -357,6 +357,7 @@ st.markdown(
   border-radius: 16px;
   padding: 36px 28px;
   height: 100%;
+  text-align: center;
 }
 .orbit-card h3 {
   font-size: 27px;
@@ -364,6 +365,7 @@ st.markdown(
   font-weight: 500;
   color: #FFFFFF;
   line-height: 1.3;
+  text-align: center;
 }
 .orbit-card p {
   font-size: 16px;
@@ -371,6 +373,7 @@ st.markdown(
   line-height: 1.65;
   color: #9999AA;
   font-weight: 300;
+  text-align: center;
 }
 
 /* ── Feature sections ── */
@@ -583,7 +586,7 @@ hero_col_left, hero_col_center, hero_col_right = st.columns([1.2, 1.0, 1.2])
 with hero_col_center:
     if st.button(hero_cta, key="hero_daily_prediction", type="primary"):
         st.switch_page(daily_target)
-st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height:0;'></div>", unsafe_allow_html=True)
 
 st.markdown(
     f"""
