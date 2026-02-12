@@ -302,9 +302,9 @@ st.markdown(
   background: #FFFFFF !important;
   color: #000000 !important;
   border: 1px solid #FFFFFF !important;
-  border-radius: 75px !important;
-  padding: 12px 30px !important;
-  min-width: 320px !important;
+  border-radius: 56px !important;
+  padding: 9px 22px !important;
+  min-width: 240px !important;
   opacity: 1 !important;
 }
 [data-testid="stAppViewContainer"] .stButton > button[kind="primary"] *,
