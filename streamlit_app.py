@@ -108,7 +108,7 @@ intro_p1 = _safe_text(intro.get("paragraph_1"), str(intro_default.get("paragraph
 intro_p2 = _safe_text(intro.get("paragraph_2"), str(intro_default.get("paragraph_2", "")))
 intro_punch = _safe_text(intro.get("punch_line"), str(intro_default.get("punch_line", "")))
 
-inside_orbit_heading = "Inside Orbit"
+inside_orbit_heading = "Inside Orbit AI"
 inside_orbit_cards = [
     {
         "title": "Give us three facts about your birth",
@@ -121,14 +121,14 @@ inside_orbit_cards = [
         "title": "Get a reading that couldn't belong to anyone else",
         "body": (
             "Most horoscopes are written for one-twelfth of the human population at a time. "
-            "Yours is written for you; based on your actual chart, your actual transits, right now."
+            "Yours is written for you."
         ),
     },
     {
         "title": "Still Curious? I'm on speed dial",
         "body": (
             "Career crossroads. A relationship that doesn't add up. That restless feeling you can't explain. "
-            "Talk to Orbit the way you'd talk to someone who already knows your whole story; because it does."
+            "Talk to Orbit AI the way you'd talk to someone who already knows your whole story; because it does."
         ),
     },
 ]
@@ -334,7 +334,7 @@ st.markdown(
   background: #111118;
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 16px;
-  padding: 12px 14px 16px 14px;
+  padding: 12px 14px 12px 14px;
 }
 .orbit-how-heading {
   font-size: 44px;
@@ -541,7 +541,7 @@ st.markdown(
     min-width: 280px !important;
   }
   .orbit-how-panel {
-    padding: 10px 10px 12px 10px;
+    padding: 10px;
   }
   .orbit-how-heading {
     font-size: 34px;
