@@ -88,9 +88,6 @@ chat_target = "pages/17_Orbit_AI_Chat.py" if user else "pages/04_Auth_Sign_In.py
 
 homepage_content = load_homepage_content()
 
-if user:
-    st.page_link("pages/08_Homepage_CMS.py", label="Open Homepage Editor", icon="🛠️")
-
 hero = _as_dict(homepage_content.get("hero"))
 hero_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("hero"))
 hero_title = _safe_text(hero.get("title"), str(hero_default.get("title", "Orbit AI")))
@@ -236,57 +233,48 @@ st.markdown(
   text-align: center;
   margin: 0 0 16px 0;
 }
-
-/* ── Hero ── */
-.orbit-hero-section {
-  padding-top: 68px;
-  padding-bottom: 0;
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+  padding: 60px 20px;
 }
-.orbit-hero-section .orbit-h1 {
-  margin: 0;
-  font-size: 64px;
-  text-align: center;
-}
-.orbit-hero-section .orbit-h1 a {
-  display: none !important;
-}
-.orbit-hero-subtitle {
-  margin: 32px auto 0 auto;
-  max-width: 680px;
-  font-size: 20px;
-  line-height: 1.65;
-  color: #9999AA;
-  font-weight: 300;
-  text-align: center;
-}
-.orbit-hero-punchline {
-  margin: 36px auto 0 auto;
-  max-width: 680px;
-  font-size: 20px;
-  line-height: 1.65;
-  color: #FFFFFF;
+.hero-title {
+  font-size: 3.5rem;
+  margin-bottom: 24px;
   font-weight: 500;
-  text-align: center;
+  color: #FFFFFF;
+  line-height: 1.2;
 }
-
-/* ── Hero CTA button ── */
-.orbit-hero-cta {
-  background: #0A0A0F;
-  padding-top: 48px;
-  padding-bottom: 100px;
-  display: flex;
-  justify-content: center;
+.hero-description {
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+  color: #9999AA;
+  font-size: 17px;
 }
-.orbit-hero-cta [data-testid="column"] {
-  display: flex;
-  justify-content: center;
+.punchline {
+  display: block;
+  margin-top: 20px;
+  font-weight: 400;
+  color: #FFFFFF;
 }
-.orbit-hero-cta .stButton {
-  display: flex;
-  justify-content: center;
+.hero-cta {
+  margin-top: 40px;
 }
-.orbit-hero-cta .stButton > button,
+.hero-cta .stButton > button {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  border: 1px solid #FFFFFF !important;
+  border-radius: 100px !important;
+  padding: 16px 40px !important;
+}
+.hero-cta .stButton > button:hover {
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
+}
 .orbit-final-cta .stButton > button {
   font-size: 16px !important;
   font-weight: 500 !important;
@@ -297,7 +285,6 @@ st.markdown(
   padding: 16px 40px !important;
   margin: 0 auto !important;
 }
-.orbit-hero-cta .stButton > button:hover,
 .orbit-final-cta .stButton > button:hover {
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.20), 0 0 24px rgba(139, 92, 246, 0.35) !important;
 }
@@ -312,8 +299,6 @@ st.markdown(
   display: flex;
   justify-content: center;
 }
-
-/* ── How it works ── */
 .orbit-how-section {
   background: #111118;
   padding: 100px 0;
@@ -500,7 +485,7 @@ st.markdown(
 }
 
 @media (max-width: 980px) {
-  .orbit-hero-section .orbit-h1 {
+  .hero-title {
     font-size: 46px;
   }
   .orbit-how-grid {
@@ -515,11 +500,13 @@ st.markdown(
 st.markdown(
     f"""
 <div class="orbit-root">
-  <section class="orbit-hero-section">
+  <section class="hero-section">
     <div class="orbit-container">
-      <h1 class="orbit-h1">{hero_title}</h1>
-      <p class="orbit-hero-subtitle">Your horoscope said something about &#x27;new beginnings&#x27; and &#x27;trusting the process.&#x27; Cool. So did everyone else&#x27;s. That&#x27;s like diagnosing someone by looking at their shoes.</p>
-      <p class="orbit-hero-punchline">The universe doesn&#x27;t deal in vague predictions. Neither do we.</p>
+      <h1 class="hero-title">{hero_title}</h1>
+      <p class="hero-description">
+        Your horoscope said something about &#x27;new beginnings&#x27; and &#x27;trusting the process.&#x27; Cool. So did everyone else&#x27;s. That&#x27;s like diagnosing someone by looking at their shoes.
+        <span class="punchline">The universe doesn&#x27;t deal in vague predictions. Neither do we.</span>
+      </p>
     </div>
   </section>
 </div>
@@ -527,7 +514,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown('<div class="orbit-hero-cta">', unsafe_allow_html=True)
+st.markdown('<div class="hero-cta">', unsafe_allow_html=True)
 hero_col_left, hero_col_center, hero_col_right = st.columns([2.4, 2.2, 2.4])
 with hero_col_center:
     if st.button(hero_cta, key="hero_daily_prediction"):
