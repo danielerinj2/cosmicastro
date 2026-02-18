@@ -182,7 +182,7 @@ compat_tag = _safe_text(compat_feature.get("tagline"), str(compat_default.get("t
 chat_feature = _as_dict(homepage_content.get("chatbot_feature"))
 chat_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("chatbot_feature"))
 chat_title = _safe_text("Ask Orbit AI", "")
-chat_subheading = _safe_text("Real-time answers.", "")
+chat_subheading = _safe_text("Real-time answers", "")
 chat_intro = _safe_text(
     "The thing you're overthinking at 2 a.m. You bring the question. "
     "No scheduling. No waiting. An astrologer in your pocket. 24/7",
