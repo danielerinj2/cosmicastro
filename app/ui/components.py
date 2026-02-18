@@ -106,80 +106,26 @@ def parse_time_ampm(value: str) -> time | None:
 
 
 def render_unicorn_scene(height: int = 520) -> None:
-    container_height = max(int(height), 360)
-    min_height = 420
-    max_height = max(container_height, 620)
-    # Keep a wide cinematic ratio while adapting to viewport width.
-    width_ratio = 0.55
+    container_height = max(int(height), 520)
     snippet = f"""
-<style>
-html, body {{
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  overflow: hidden;
-}}
-#unicorn-wrap {{
-  width: 100%;
-  min-height: {min_height}px;
-  max-height: {max_height}px;
-}}
-#unicorn-container {{
-  width: 100%;
-  height: 100%;
-}}
-</style>
-<div id="unicorn-wrap">
-  <div id="unicorn-container" data-us-project="{UNICORN_PROJECT_ID}"></div>
-</div>
+<div
+  id="unicorn-container"
+  data-us-project="{UNICORN_PROJECT_ID}"
+  style="width:100%; height:{container_height}px;"
+></div>
 <script src="{UNICORN_SDK_URL}"></script>
 <script>
 (function() {{
-  const wrap = document.getElementById("unicorn-wrap");
   const sceneEl = document.getElementById("unicorn-container");
-  const minH = {min_height};
-  const maxH = {max_height};
-  const ratio = {width_ratio};
-
-  function resizeScene() {{
-    const viewWidth = window.innerWidth || document.documentElement.clientWidth || 1200;
-    const target = Math.max(minH, Math.min(maxH, Math.round(viewWidth * ratio)));
-    wrap.style.height = target + "px";
-    window.parent.postMessage({{
-      isStreamlitMessage: true,
-      type: "streamlit:setFrameHeight",
-      height: target
-    }}, "*");
-  }}
-
-  window.addEventListener("resize", resizeScene);
-  resizeScene();
-
-  async function mountScene() {{
-    if (!window.UnicornStudio || sceneEl.dataset.sceneMounted === "1") return;
+  function mountScene() {{
+    if (!window.UnicornStudio || !sceneEl || sceneEl.dataset.sceneMounted === "1") return;
     try {{
-      // Primary integration for app containers (Streamlit iframe).
-      await window.UnicornStudio.addScene({{
-        elementId: "unicorn-container",
-        projectId: "{UNICORN_PROJECT_ID}",
-        scale: 1,
-        dpi: 1.5,
-        fps: 60,
-        lazyLoad: true,
-        production: true
-      }});
-      sceneEl.dataset.sceneMounted = "1";
-    }} catch (err) {{
-      try {{
-        // Fallback to vanilla init pattern.
+      if (typeof window.UnicornStudio.init === "function") {{
         window.UnicornStudio.init({{ production: true }});
         sceneEl.dataset.sceneMounted = "1";
-      }} catch (_) {{
-        // Keep silent; page continues working even if scene fails.
       }}
-    }}
+    }} catch (_) {{}}
   }}
-
   function waitForSdk() {{
     if (!window.UnicornStudio) {{
       window.setTimeout(waitForSdk, 60);
@@ -193,7 +139,7 @@ html, body {{
 </script>
 <noscript>Enable JavaScript to view the interactive scene.</noscript>
 """
-    components_html(snippet, height=max_height, scrolling=False)
+    components_html(snippet, height=container_height, scrolling=False)
 
 
 def _apply_theme(theme_preference: str) -> None:
