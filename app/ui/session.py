@@ -33,6 +33,11 @@ def require_auth() -> User:
     user = get_current_user()
     if user is None:
         st.warning("Please sign in to access this page.")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.page_link("pages/04_Auth_Sign_In.py", label="Sign In")
+        with col2:
+            st.page_link("pages/03_Auth_Sign_Up.py", label="Sign Up")
+        st.page_link("streamlit_app.py", label="Go to Landing")
         st.stop()
     return user
-
