@@ -105,8 +105,8 @@ def parse_time_ampm(value: str) -> time | None:
     return time(hour=hour_24, minute=minute)
 
 
-def render_unicorn_scene(height: int = 520) -> None:
-    container_height = max(int(height), 520)
+def render_unicorn_scene(height: int = 700) -> None:
+    container_height = max(int(height), 700)
     snippet = f"""
 <div
   id="unicorn-container"
@@ -121,7 +121,7 @@ def render_unicorn_scene(height: int = 520) -> None:
     if (!window.UnicornStudio || !sceneEl || sceneEl.dataset.sceneMounted === "1") return;
     try {{
       if (typeof window.UnicornStudio.init === "function") {{
-        window.UnicornStudio.init({{ production: true }});
+        window.UnicornStudio.init();
         sceneEl.dataset.sceneMounted = "1";
       }}
     }} catch (_) {{}}

@@ -23,7 +23,7 @@ context = service.home_context(user)
 st.info(context["trust_strip"])
 
 st.subheader("Cosmic Scene")
-render_unicorn_scene()
+render_unicorn_scene(height=700)
 
 daily = context["daily"]
 moon = context["moon"]
