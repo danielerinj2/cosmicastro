@@ -300,6 +300,20 @@ button, input, textarea, select, label, p, span, li, small, div {{
 .stSlider [data-testid="stTickBarMin"], .stSlider [data-testid="stTickBarMax"] {{
   color: {muted_text};
 }}
+.stExpander {{
+  margin-bottom: 10px !important;
+}}
+[data-testid="stExpander"] details {{
+  border-radius: 12px !important;
+}}
+[data-testid="stExpander"] details summary {{
+  min-height: 44px !important;
+  align-items: center !important;
+}}
+[data-testid="stExpander"] details summary p {{
+  line-height: 1.45 !important;
+  white-space: normal !important;
+}}
 .sidebar-trust {{
   margin-top: 10px;
   font-size: 0.92rem;
