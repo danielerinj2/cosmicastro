@@ -105,12 +105,56 @@ def parse_time_ampm(value: str) -> time | None:
     return time(hour=hour_24, minute=minute)
 
 
-def render_unicorn_scene(height: int = 400) -> None:
-    container_height = max(int(height), 280)
+def render_unicorn_scene(height: int = 520) -> None:
+    container_height = max(int(height), 360)
+    min_height = 420
+    max_height = max(container_height, 620)
+    # Keep a wide cinematic ratio while adapting to viewport width.
+    width_ratio = 0.55
     snippet = f"""
-<div id="unicorn-container" style="width:100%; height:{container_height}px;"></div>
+<style>
+html, body {{
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+}}
+#unicorn-wrap {{
+  width: 100%;
+  min-height: {min_height}px;
+  max-height: {max_height}px;
+}}
+#unicorn-container {{
+  width: 100%;
+  height: 100%;
+}}
+</style>
+<div id="unicorn-wrap">
+  <div id="unicorn-container"></div>
+</div>
 <script src="{UNICORN_SDK_URL}"></script>
 <script>
+(function() {{
+  const wrap = document.getElementById("unicorn-wrap");
+  const minH = {min_height};
+  const maxH = {max_height};
+  const ratio = {width_ratio};
+
+  function resizeScene() {{
+    const viewWidth = window.innerWidth || document.documentElement.clientWidth || 1200;
+    const target = Math.max(minH, Math.min(maxH, Math.round(viewWidth * ratio)));
+    wrap.style.height = target + "px";
+    window.parent.postMessage({{
+      isStreamlitMessage: true,
+      type: "streamlit:setFrameHeight",
+      height: target
+    }}, "*");
+  }}
+
+  window.addEventListener("resize", resizeScene);
+  resizeScene();
+}})();
+
 (async function () {{
   try {{
     if (!window.UnicornStudio) return;
@@ -130,7 +174,7 @@ def render_unicorn_scene(height: int = 400) -> None:
 </script>
 <noscript>Enable JavaScript to view the interactive scene.</noscript>
 """
-    components_html(snippet, height=container_height, scrolling=False)
+    components_html(snippet, height=max_height, scrolling=False)
 
 
 def _apply_theme(theme_preference: str) -> None:
