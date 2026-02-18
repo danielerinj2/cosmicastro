@@ -398,6 +398,11 @@ st.markdown(
 }
 .orbit-feature-daily {
   padding-top: 36px;
+  padding-bottom: 24px;
+}
+.orbit-feature-birth {
+  padding-top: 36px;
+  padding-bottom: 24px;
 }
 .orbit-feature-section .orbit-copy {
   max-width: 720px;
@@ -427,6 +432,15 @@ st.markdown(
   margin: 0;
 }
 .orbit-feature-daily .orbit-body {
+  margin: 24px 0 0 0;
+}
+.orbit-feature-birth .orbit-label {
+  margin: 0 0 24px 0;
+}
+.orbit-feature-birth .orbit-h2 {
+  margin: 0;
+}
+.orbit-feature-birth .orbit-body {
   margin: 24px 0 0 0;
 }
 
@@ -624,12 +638,12 @@ st.markdown("<div style='height:0;'></div>", unsafe_allow_html=True)
 
 
 def _render_center_cta(label: str, key: str, target: str) -> None:
-    st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:6px;'></div>", unsafe_allow_html=True)
     col_left, col_center, col_right = st.columns([1, 1, 1])
     with col_center:
         if st.button(label, key=key, type="primary"):
             st.switch_page(target)
-    st.markdown("<div style='height:18px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
 
 
 st.markdown(
@@ -651,7 +665,6 @@ st.markdown(
       <p class="orbit-label">{daily_label}</p>
       <h2 class="orbit-h2">{daily_title}</h2>
       <p class="orbit-body">{daily_p1}</p>
-      <p class="orbit-tagline">{daily_tag}</p>
     </div>
   </section>
 </div>
@@ -665,12 +678,11 @@ st.markdown(
     f"""
 <div class="orbit-root">
 
-  <section class="orbit-feature-section">
+  <section class="orbit-feature-section orbit-feature-birth">
     <div class="orbit-container orbit-copy">
       <p class="orbit-label">{birth_label}</p>
       <h2 class="orbit-h2">{birth_title}</h2>
       <p class="orbit-body">{birth_p1}</p>
-      <p class="orbit-tagline">{birth_tag}</p>
     </div>
   </section>
 </div>
