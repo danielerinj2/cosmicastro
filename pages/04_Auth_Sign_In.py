@@ -32,6 +32,9 @@ if submitted:
     else:
         st.error(result.message)
 
+st.caption("New here?")
+st.page_link("pages/03_Auth_Sign_Up.py", label="Sign Up")
+
 st.divider()
 st.subheader("Forgot password?")
 with st.form("forgot_password_form"):
