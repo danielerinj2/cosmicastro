@@ -94,6 +94,9 @@ if reset_token:
 
 daily_target = "pages/12_Daily_Horoscope.py" if user else "pages/04_Auth_Sign_In.py"
 chat_target = "pages/17_Orbit_AI_Chat.py" if user else "pages/04_Auth_Sign_In.py"
+origin_target = "pages/11_Origin_Chart.py" if user else "pages/04_Auth_Sign_In.py"
+between_target = "pages/13_Between_Us.py" if user else "pages/04_Auth_Sign_In.py"
+yearly_target = "pages/14_Yearly_Chart.py" if user else "pages/04_Auth_Sign_In.py"
 
 homepage_content = load_homepage_content()
 
@@ -182,22 +185,18 @@ for message in chat_messages[:8]:
     text = _safe_text(msg.get("text"), "")
     if role == "assistant":
         chat_rows.append(
-            f"""
-            <div class="orbit-chat-row assistant">
-              <div class="orbit-assistant-wrap">
-                <span class="orbit-ai-icon">O</span>
-                <div class="orbit-bubble assistant">{text}</div>
-              </div>
-            </div>
-            """
+            "<div class=\"orbit-chat-row assistant\">"
+            "<div class=\"orbit-assistant-wrap\">"
+            "<span class=\"orbit-ai-icon\">O</span>"
+            f"<div class=\"orbit-bubble assistant\">{text}</div>"
+            "</div>"
+            "</div>"
         )
     else:
         chat_rows.append(
-            f"""
-            <div class="orbit-chat-row user">
-              <div class="orbit-bubble user">{text}</div>
-            </div>
-            """
+            "<div class=\"orbit-chat-row user\">"
+            f"<div class=\"orbit-bubble user\">{text}</div>"
+            "</div>"
         )
 chat_html = "".join(chat_rows)
 
@@ -386,7 +385,7 @@ st.markdown(
 
 /* ── Feature sections ── */
 .orbit-feature-section {
-  padding: 100px 0;
+  padding: 56px 0;
   text-align: center;
 }
 .orbit-feature-daily {
@@ -408,7 +407,7 @@ st.markdown(
   margin-top: 16px;
 }
 .orbit-feature-section .orbit-tagline {
-  margin-top: 20px;
+  margin-top: 16px;
   color: #FFFFFF;
   font-weight: 500;
   font-size: 18px;
@@ -425,7 +424,7 @@ st.markdown(
 
 /* ── Chat section ── */
 .orbit-chat-section {
-  padding: 100px 0;
+  padding: 56px 0;
   text-align: center;
 }
 .orbit-chat-section .orbit-copy {
@@ -441,7 +440,7 @@ st.markdown(
   margin: 24px auto 0 auto;
 }
 .orbit-chat-card {
-  margin: 48px auto 0 auto;
+  margin: 28px auto 0 auto;
   max-width: 600px;
   background: #111118;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -500,7 +499,7 @@ st.markdown(
 }
 .orbit-chat-closing {
   max-width: 600px;
-  margin: 32px auto 0 auto;
+  margin: 20px auto 0 auto;
   text-align: center;
   font-size: 16px;
 }
@@ -508,7 +507,7 @@ st.markdown(
 /* ── Social proof ── */
 .orbit-social-section {
   background: #111118;
-  padding: 80px 0;
+  padding: 56px 0;
   text-align: center;
 }
 .orbit-social-section .orbit-h2 {
@@ -534,8 +533,8 @@ st.markdown(
 
 /* ── Closing ── */
 .orbit-closing-section {
-  padding-top: 120px;
-  padding-bottom: 140px;
+  padding-top: 72px;
+  padding-bottom: 88px;
   text-align: center;
 }
 .orbit-closing-section .orbit-h2 {
@@ -615,6 +614,14 @@ with hero_col_center:
         st.switch_page(daily_target)
 st.markdown("<div style='height:0;'></div>", unsafe_allow_html=True)
 
+
+def _render_center_cta(label: str, key: str, target: str) -> None:
+    col_left, col_center, col_right = st.columns([1, 1, 1])
+    with col_center:
+        if st.button(label, key=key, type="primary"):
+            st.switch_page(target)
+
+
 st.markdown(
     f"""
 <div class="orbit-root">
@@ -637,6 +644,16 @@ st.markdown(
       <p class="orbit-tagline">{daily_tag}</p>
     </div>
   </section>
+</div>
+""",
+    unsafe_allow_html=True,
+)
+
+_render_center_cta("Get Your Daily Prediction", "daily_section_cta", daily_target)
+
+st.markdown(
+    f"""
+<div class="orbit-root">
 
   <section class="orbit-feature-section">
     <div class="orbit-container orbit-copy">
@@ -647,7 +664,16 @@ st.markdown(
       <p class="orbit-tagline">{birth_tag}</p>
     </div>
   </section>
+</div>
+""",
+    unsafe_allow_html=True,
+)
 
+_render_center_cta("View Origin Chart", "birth_section_cta", origin_target)
+
+st.markdown(
+    f"""
+<div class="orbit-root">
   <section class="orbit-feature-section">
     <div class="orbit-container orbit-copy">
       <p class="orbit-label">{compat_label}</p>
@@ -657,7 +683,16 @@ st.markdown(
       <p class="orbit-tagline">{compat_tag}</p>
     </div>
   </section>
+</div>
+""",
+    unsafe_allow_html=True,
+)
 
+_render_center_cta("Check Compatibility", "compat_section_cta", between_target)
+
+st.markdown(
+    f"""
+<div class="orbit-root">
   <section class="orbit-chat-section">
     <div class="orbit-container">
       <div class="orbit-copy">
@@ -681,7 +716,16 @@ st.markdown(
       <p class="orbit-tagline" style="font-size:16px;">{yearly_tag}</p>
     </div>
   </section>
+</div>
+""",
+    unsafe_allow_html=True,
+)
 
+_render_center_cta("Open Yearly Forecast", "yearly_section_cta", yearly_target)
+
+st.markdown(
+    f"""
+<div class="orbit-root">
   <section class="orbit-social-section">
     <div class="orbit-container orbit-copy">
       <h2 class="orbit-h2">{social_title}</h2>
@@ -701,7 +745,4 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-final_col_left, final_col_center, final_col_right = st.columns([2.4, 2.2, 2.4])
-with final_col_center:
-    if st.button(closing_cta, key="closing_chatbot_cta", type="primary"):
-        st.switch_page(chat_target)
+_render_center_cta(closing_cta, "closing_chatbot_cta", chat_target)
