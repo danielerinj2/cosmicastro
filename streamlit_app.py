@@ -153,15 +153,22 @@ daily_feature = _as_dict(homepage_content.get("daily_feature"))
 daily_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("daily_feature"))
 daily_label = _safe_text(daily_feature.get("label"), str(daily_default.get("label", "DAILY HOROSCOPE")))
 daily_title = _safe_text(daily_feature.get("title"), str(daily_default.get("title", "")))
-daily_p1 = _safe_text(daily_feature.get("paragraph_1"), str(daily_default.get("paragraph_1", "")))
+daily_p1 = _safe_text(
+    "Calibrated to the sky. What's active in your chart today. What deserves restraint and what deserves action.",
+    "",
+)
 daily_tag = _safe_text(daily_feature.get("tagline"), str(daily_default.get("tagline", "")))
 
 birth_feature = _as_dict(homepage_content.get("birth_chart_feature"))
 birth_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("birth_chart_feature"))
 birth_label = _safe_text(birth_feature.get("label"), str(birth_default.get("label", "BIRTH CHART")))
 birth_title = _safe_text(birth_feature.get("title"), str(birth_default.get("title", "")))
-birth_p1 = _safe_text(birth_feature.get("paragraph_1"), str(birth_default.get("paragraph_1", "")))
-birth_p2 = _safe_text(birth_feature.get("paragraph_2"), str(birth_default.get("paragraph_2", "")))
+birth_p1 = _safe_text(
+    "A complete analysis of your natal chart; every planet, every house, every major aspect; interpreted as a coherent pattern. "
+    "Orbit doesn't isolate placements; it examines how they interact to reveal recurring dynamics in your personality, relationships, and stress responses.",
+    "",
+)
+birth_p2 = ""
 birth_tag = _safe_text(birth_feature.get("tagline"), str(birth_default.get("tagline", "")))
 
 compat_feature = _as_dict(homepage_content.get("compatibility_feature"))
@@ -617,10 +624,12 @@ st.markdown("<div style='height:0;'></div>", unsafe_allow_html=True)
 
 
 def _render_center_cta(label: str, key: str, target: str) -> None:
+    st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
     col_left, col_center, col_right = st.columns([1, 1, 1])
     with col_center:
         if st.button(label, key=key, type="primary"):
             st.switch_page(target)
+    st.markdown("<div style='height:18px;'></div>", unsafe_allow_html=True)
 
 
 st.markdown(
@@ -650,7 +659,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-_render_center_cta("Get Your Daily Prediction", "daily_section_cta", daily_target)
+_render_center_cta("Get Today's Reading", "daily_section_cta", daily_target)
 
 st.markdown(
     f"""
@@ -661,7 +670,6 @@ st.markdown(
       <p class="orbit-label">{birth_label}</p>
       <h2 class="orbit-h2">{birth_title}</h2>
       <p class="orbit-body">{birth_p1}</p>
-      <p class="orbit-body">{birth_p2}</p>
       <p class="orbit-tagline">{birth_tag}</p>
     </div>
   </section>
@@ -670,7 +678,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-_render_center_cta("View Origin Chart", "birth_section_cta", origin_target)
+_render_center_cta("Get My Birth Chart", "birth_section_cta", origin_target)
 
 st.markdown(
     f"""
