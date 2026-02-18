@@ -9,7 +9,7 @@ from app.services.reading_service import ReadingService
 from app.ui.components import app_header, auth_sidebar
 from app.ui.session import init_session, require_auth
 
-st.set_page_config(page_title="Orbit AI Chat", page_icon="🔮", layout="wide")
+st.set_page_config(page_title="Orbit AI Chat", page_icon="🔮", layout="wide", initial_sidebar_state="collapsed")
 init_session()
 user = require_auth()
 auth_sidebar(user)

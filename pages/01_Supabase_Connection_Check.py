@@ -8,7 +8,7 @@ from app.infra.supabase_probe import probe_connection, probe_required_columns, p
 from app.ui.components import auth_sidebar
 from app.ui.session import get_current_user, init_session
 
-st.set_page_config(page_title="Supabase Connection Check", page_icon="🧪", layout="wide")
+st.set_page_config(page_title="Supabase Connection Check", page_icon="🧪", layout="wide", initial_sidebar_state="collapsed")
 init_session()
 auth_sidebar(get_current_user())
 

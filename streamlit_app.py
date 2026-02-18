@@ -15,6 +15,7 @@ st.set_page_config(
     page_title="Discover Your Cosmic Self",
     page_icon="✨",
     layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
 init_session()

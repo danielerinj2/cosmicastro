@@ -10,7 +10,7 @@ from app.ui.components import app_header, auth_sidebar, confidence_banner, parse
 from app.ui.session import init_session, require_auth
 from app.utils.astro import sun_sign_for_date
 
-st.set_page_config(page_title="Between Us", page_icon="💞", layout="wide")
+st.set_page_config(page_title="Between Us", page_icon="💞", layout="wide", initial_sidebar_state="collapsed")
 init_session()
 user = require_auth()
 auth_sidebar(user)

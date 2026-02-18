@@ -10,7 +10,6 @@ from streamlit.components.v1 import html as components_html
 from app.constants import LAUNCH_TRUST_MESSAGE
 from app.domain.models import User
 from app.services.stripe_service import StripeService
-from app.ui.session import logout_user
 
 _AMPM_TIME_RE = re.compile(r"^\s*(1[0-2]|0?[1-9]):([0-5][0-9])\s*([AaPp][Mm])\s*$")
 UNICORN_PROJECT_ID = "prCymyNE9DjMip7xfyZf"
@@ -29,38 +28,14 @@ def auth_sidebar(user: User | None) -> None:
     theme_preference = user.theme_preference if user else "dark"
     _apply_theme(theme_preference)
     with st.sidebar:
-        st.markdown("## Discover Your Cosmic Self")
-        if user:
-            st.write(f"Signed in as **{user.first_name}**")
-            st.write(f"Plan: {user.subscription_tier.title()}")
-            st.divider()
-            st.markdown("### App")
-            st.page_link("streamlit_app.py", label="Landing")
-            st.page_link("pages/10_Home.py", label="Home")
-            st.page_link("pages/12_Daily_Horoscope.py", label="Daily Horoscope")
-            st.page_link("pages/11_Origin_Chart.py", label="Origin Chart")
-            st.page_link("pages/13_Between_Us.py", label="Between Us")
-            st.page_link("pages/14_Yearly_Chart.py", label="Yearly Chart")
-            st.page_link("pages/16_Journal_History.py", label="Journal History")
-            st.page_link("pages/17_Orbit_AI_Chat.py", label="Orbit AI Chat")
-            st.page_link("pages/15_Settings_Profile.py", label="Settings")
-
-            st.divider()
-            st.markdown("### Admin")
-            st.page_link("pages/08_Homepage_CMS.py", label="Homepage CMS")
-            if st.button("Log out"):
-                logout_user()
-                st.rerun()
-        else:
-            st.write("Not signed in.")
-            st.divider()
-            st.markdown("### Access")
-            st.page_link("streamlit_app.py", label="Landing")
-            st.page_link("pages/03_Auth_Sign_Up.py", label="Sign Up")
-            st.page_link("pages/04_Auth_Sign_In.py", label="Sign In")
-            st.page_link("pages/05_Auth_Password_Reset.py", label="Reset Password")
-        st.divider()
-        st.info(LAUNCH_TRUST_MESSAGE)
+        st.page_link("pages/12_Daily_Horoscope.py", label="Daily Horoscope")
+        st.page_link("pages/11_Origin_Chart.py", label="Origin Chart")
+        st.page_link("pages/13_Between_Us.py", label="Between Us")
+        st.page_link("pages/14_Yearly_Chart.py", label="Yearly Chart")
+        st.page_link("pages/17_Orbit_AI_Chat.py", label="Orbit AI Chat")
+        st.page_link("pages/15_Settings_Profile.py", label="Settings")
+        st.page_link("pages/09_Log_Out.py", label="Log out")
+        st.markdown(f"<p class='sidebar-trust'>{LAUNCH_TRUST_MESSAGE}</p>", unsafe_allow_html=True)
 
 
 def confidence_banner(mode: str, full_text: str, light_text: str) -> None:
@@ -248,17 +223,24 @@ button, input, textarea, select, label, p, span, li, small, div {{
   opacity: 1 !important;
 }}
 [data-testid="stSidebar"] [data-testid="stPageLink"] a {{
-  border-radius: 10px !important;
-  border: 1px solid transparent !important;
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 0 10px 0 !important;
+  text-decoration: none !important;
 }}
 [data-testid="stSidebar"] [data-testid="stPageLink"] a:hover {{
-  background: {sidebar_link_hover_bg} !important;
-  border-color: {border_color} !important;
+  background: transparent !important;
+  border: none !important;
+  text-decoration: underline !important;
 }}
 [data-testid="stSidebar"] [data-testid="stPageLink"] a[aria-current="page"],
 [data-testid="stSidebar"] [data-testid="stPageLink"] a[aria-selected="true"] {{
-  background: {sidebar_link_bg} !important;
-  border-color: {border_color} !important;
+  background: transparent !important;
+  border: none !important;
+  font-weight: 500 !important;
+  text-decoration: underline !important;
 }}
 [data-testid="stSidebar"] [data-testid="stPageLink"] a[aria-disabled="true"],
 [data-testid="stSidebar"] [data-testid="stPageLink"] a:disabled {{
@@ -317,6 +299,12 @@ button, input, textarea, select, label, p, span, li, small, div {{
 }}
 .stSlider [data-testid="stTickBarMin"], .stSlider [data-testid="stTickBarMax"] {{
   color: {muted_text};
+}}
+.sidebar-trust {{
+  margin-top: 10px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: {muted_text} !important;
 }}
 </style>
         """,

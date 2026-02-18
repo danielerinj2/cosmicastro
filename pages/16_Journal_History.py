@@ -6,7 +6,7 @@ from app.repos.supabase_repo import SupabaseRepository
 from app.ui.components import app_header, auth_sidebar
 from app.ui.session import init_session, require_auth
 
-st.set_page_config(page_title="Journal / History", page_icon="📓", layout="wide")
+st.set_page_config(page_title="Journal / History", page_icon="📓", layout="wide", initial_sidebar_state="collapsed")
 init_session()
 user = require_auth()
 auth_sidebar(user)

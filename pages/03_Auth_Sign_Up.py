@@ -8,7 +8,7 @@ from app.services.auth_service import AuthService
 from app.ui.components import app_header, auth_sidebar, parse_time_ampm
 from app.ui.session import get_current_user, init_session, login_user
 
-st.set_page_config(page_title="Sign Up", page_icon="📝", layout="wide")
+st.set_page_config(page_title="Sign Up", page_icon="📝", layout="wide", initial_sidebar_state="collapsed")
 init_session()
 current_user = get_current_user()
 auth_sidebar(current_user)

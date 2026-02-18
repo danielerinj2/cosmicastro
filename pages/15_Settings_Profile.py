@@ -10,7 +10,7 @@ from app.ui.components import app_header, auth_sidebar, format_time_ampm, parse_
 from app.ui.session import get_current_user, init_session, logout_user, require_auth
 from app.utils.astro import sun_sign_for_date
 
-st.set_page_config(page_title="Settings", page_icon="⚙️", layout="wide")
+st.set_page_config(page_title="Settings", page_icon="⚙️", layout="wide", initial_sidebar_state="collapsed")
 init_session()
 user = require_auth()
 auth_sidebar(user)
