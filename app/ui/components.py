@@ -111,19 +111,43 @@ def render_unicorn_scene(height: int = 700) -> None:
 <div
   id="unicorn-container"
   data-us-project="{UNICORN_PROJECT_ID}"
+  data-us-dpi="1.5"
+  data-us-scale="1"
+  data-us-fps="60"
+  data-us-lazyload="true"
   style="width:100%; height:{container_height}px;"
 ></div>
 <script src="{UNICORN_SDK_URL}"></script>
 <script>
 (function() {{
   const sceneEl = document.getElementById("unicorn-container");
+  const sceneOptions = {{
+    element: sceneEl,
+    projectId: "{UNICORN_PROJECT_ID}",
+    dpi: 1.5,
+    scale: 1,
+    fps: 60,
+    lazyLoad: true,
+    fixed: false
+  }};
+
   function mountScene() {{
     if (!window.UnicornStudio || !sceneEl || sceneEl.dataset.sceneMounted === "1") return;
     try {{
-      if (typeof window.UnicornStudio.init === "function") {{
-        window.UnicornStudio.init();
-        sceneEl.dataset.sceneMounted = "1";
-      }}
+      // Framer module equivalent: mount a scene on a specific element with explicit options.
+      const existing = window.UnicornStudio.scenes?.find((s) => s.element === sceneEl);
+      if (existing) existing.destroy();
+      window.UnicornStudio.addScene(sceneOptions)
+        .then(() => {{
+          sceneEl.dataset.sceneMounted = "1";
+        }})
+        .catch(() => {{
+          // Safe fallback if addScene fails in iframe/runtime edge-cases.
+          if (typeof window.UnicornStudio.init === "function") {{
+            window.UnicornStudio.init();
+            sceneEl.dataset.sceneMounted = "1";
+          }}
+        }});
     }} catch (_) {{}}
   }}
   function waitForSdk() {{
