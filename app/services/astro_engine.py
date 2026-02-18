@@ -125,6 +125,9 @@ class DeterministicAstroEngine:
         year_start, year_end = current_profection_window(reference_day, user.dob)
         house = profected_house(age)
         house_topic = HOUSE_TOPICS[house]
+        topic_parts = [part.strip().lower() for part in house_topic.split(",") if part.strip()]
+        topic_primary = topic_parts[0] if topic_parts else house_topic.lower()
+        topic_secondary = ", ".join(topic_parts[1:3]) if len(topic_parts) > 1 else topic_primary
 
         if full_mode:
             asc_sign = approximate_ascendant(user.dob, user.birth_time)
@@ -136,26 +139,47 @@ class DeterministicAstroEngine:
             lord = None
             mode_label = "Birth-date-only year view"
 
+        lord_focus_map = {
+            "Sun": "visibility, ownership, and clear decisions",
+            "Moon": "emotional pacing and sustainable routines",
+            "Mercury": "communication quality and clean planning",
+            "Venus": "relational diplomacy and value alignment",
+            "Mars": "decisive action and boundary enforcement",
+            "Jupiter": "strategic expansion with disciplined optimism",
+            "Saturn": "structure, accountability, and long-term durability",
+        }
+        lord_focus = lord_focus_map.get(lord or "", "consistent execution and practical priorities")
+        if full_mode and lord:
+            yearly_tone = (
+                f"Because {lord} rules this year, progress comes from {lord_focus}, not impulsive pivots."
+            )
+        else:
+            yearly_tone = (
+                "This is a precision year: fewer priorities, clearer boundaries, and repeatable execution."
+            )
+
         timeline = [
             {
                 "segment": YEARLY_TIMELINE_SEGMENTS[0],
                 "llm_text": (
-                    f"Beginning of the year is about setting direction around {house_topic.lower()}. "
-                    "You are likely to notice what requires structure, what can be simplified, and what deserves clear priority."
+                    f"First phase (months 1-4): establish direction in {topic_primary}. "
+                    f"Audit existing commitments, define one measurable outcome, and set a weekly rhythm that protects {topic_secondary}. "
+                    f"{yearly_tone}"
                 ),
             },
             {
                 "segment": YEARLY_TIMELINE_SEGMENTS[1],
                 "llm_text": (
-                    f"Middle of the year tests commitment to {house_topic.lower()}. "
-                    "This phase often brings tradeoffs, feedback, and practical adjustments that make the path more realistic."
+                    f"Middle phase (months 5-8): reality-testing around {topic_primary}. "
+                    "This is where tradeoffs surface and weak plans break. "
+                    f"Renegotiate timelines, remove low-return obligations, and double down on the two habits that stabilize {topic_secondary}."
                 ),
             },
             {
                 "segment": YEARLY_TIMELINE_SEGMENTS[2],
                 "llm_text": (
-                    f"Closing months focus on integrating lessons in {house_topic.lower()}. "
-                    "You consolidate what worked, release what drained energy, and carry clearer momentum into the next cycle."
+                    f"Closing phase (months 9-12): consolidate gains in {topic_primary} and lock in what worked. "
+                    "Document useful patterns, close lingering loops, and convert short-term wins into a durable system you can carry into the next cycle."
                 ),
             },
         ]
@@ -177,7 +201,10 @@ class DeterministicAstroEngine:
             "house_focus": {
                 "house_number": house,
                 "label": house_topic,
-                "llm_text": f"In this cycle, your attention is repeatedly pulled toward {house_topic.lower()}.",
+                "llm_text": (
+                    f"In this cycle, your attention is repeatedly pulled toward {house_topic.lower()}. "
+                    "Treat this as the year to improve quality, consistency, and decision standards in that domain."
+                ),
             },
             "ruling_planet_section": (
                 {

@@ -110,11 +110,24 @@ class ReadingService:
             return True
 
         timeline = content.get("timeline", [])
+        if len(timeline) < 3:
+            return True
+
+        generic_markers = (
+            "setting direction around",
+            "tests commitment to",
+            "focus on integrating lessons",
+            "the key focus remains",
+        )
         if len(timeline) >= 3:
             texts = [str(item.get("llm_text", "")).strip() for item in timeline]
             if all("the key focus remains" in text.lower() for text in texts):
                 return True
             if len(set(texts)) == 1:
+                return True
+            if any(any(marker in text.lower() for marker in generic_markers) for text in texts):
+                return True
+            if any(len(text) < 160 for text in texts):
                 return True
 
         return False
