@@ -130,12 +130,13 @@ html, body {{
 }}
 </style>
 <div id="unicorn-wrap">
-  <div id="unicorn-container"></div>
+  <div id="unicorn-container" data-us-project="{UNICORN_PROJECT_ID}"></div>
 </div>
 <script src="{UNICORN_SDK_URL}"></script>
 <script>
 (function() {{
   const wrap = document.getElementById("unicorn-wrap");
+  const sceneEl = document.getElementById("unicorn-container");
   const minH = {min_height};
   const maxH = {max_height};
   const ratio = {width_ratio};
@@ -153,23 +154,41 @@ html, body {{
 
   window.addEventListener("resize", resizeScene);
   resizeScene();
-}})();
 
-(async function () {{
-  try {{
-    if (!window.UnicornStudio) return;
-    await window.UnicornStudio.addScene({{
-      elementId: "unicorn-container",
-      projectId: "{UNICORN_PROJECT_ID}",
-      scale: 1,
-      dpi: 1.5,
-      fps: 60,
-      lazyLoad: true,
-      production: true
-    }});
-  }} catch (e) {{
-    // Silent fail with placeholder text below.
+  async function mountScene() {{
+    if (!window.UnicornStudio || sceneEl.dataset.sceneMounted === "1") return;
+    try {{
+      // Primary integration for app containers (Streamlit iframe).
+      await window.UnicornStudio.addScene({{
+        elementId: "unicorn-container",
+        projectId: "{UNICORN_PROJECT_ID}",
+        scale: 1,
+        dpi: 1.5,
+        fps: 60,
+        lazyLoad: true,
+        production: true
+      }});
+      sceneEl.dataset.sceneMounted = "1";
+    }} catch (err) {{
+      try {{
+        // Fallback to vanilla init pattern.
+        window.UnicornStudio.init({{ production: true }});
+        sceneEl.dataset.sceneMounted = "1";
+      }} catch (_) {{
+        // Keep silent; page continues working even if scene fails.
+      }}
+    }}
   }}
+
+  function waitForSdk() {{
+    if (!window.UnicornStudio) {{
+      window.setTimeout(waitForSdk, 60);
+      return;
+    }}
+    mountScene();
+  }}
+
+  waitForSdk();
 }})();
 </script>
 <noscript>Enable JavaScript to view the interactive scene.</noscript>
