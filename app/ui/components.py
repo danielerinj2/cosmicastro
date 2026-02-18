@@ -109,43 +109,11 @@ def render_unicorn_scene(height: int = 700) -> None:
     container_height = max(int(height), 700)
     snippet = f"""
 <div
-  id="unicorn-container"
-  style="width:100%; height:{container_height}px;"
+  data-us-project="{UNICORN_PROJECT_ID}"
+  style="width: 100%; height: {container_height}px;"
 ></div>
 <script src="{UNICORN_SDK_URL}"></script>
-<script>
-(async function () {{
-  const elementId = "unicorn-container";
-  const mountScene = async () => {{
-    if (!window.UnicornStudio) {{
-      window.setTimeout(mountScene, 60);
-      return;
-    }}
-    try {{
-      if (window.__orbitUnicornScene && typeof window.__orbitUnicornScene.destroy === "function") {{
-        window.__orbitUnicornScene.destroy();
-        window.__orbitUnicornScene = null;
-      }}
-      window.__orbitUnicornScene = await window.UnicornStudio.addScene({{
-        elementId,
-        projectId: "{UNICORN_PROJECT_ID}",
-        scale: 1,
-        dpi: 1.5,
-        fps: 60,
-        lazyLoad: true,
-        production: true
-      }});
-    }} catch (_) {{
-      try {{
-        if (typeof window.UnicornStudio.init === "function") {{
-          window.UnicornStudio.init();
-        }}
-      }} catch (_) {{}}
-    }}
-  }};
-  mountScene();
-}})();
-</script>
+<script>UnicornStudio.init();</script>
 <noscript>Enable JavaScript to view the interactive scene.</noscript>
 """
     components_html(snippet, height=container_height, scrolling=False)
