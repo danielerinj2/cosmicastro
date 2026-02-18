@@ -181,10 +181,13 @@ compat_tag = _safe_text(compat_feature.get("tagline"), str(compat_default.get("t
 
 chat_feature = _as_dict(homepage_content.get("chatbot_feature"))
 chat_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("chatbot_feature"))
-chat_label = _safe_text(chat_feature.get("label"), str(chat_default.get("label", "AI ASTROLOGER")))
-chat_title = _safe_text(chat_feature.get("title"), str(chat_default.get("title", "")))
-chat_intro = _safe_text(chat_feature.get("intro"), str(chat_default.get("intro", "")))
-chat_closing = _safe_text(chat_feature.get("closing_line"), str(chat_default.get("closing_line", "")))
+chat_title = _safe_text("Ask Orbit AI", "")
+chat_subheading = _safe_text("Real-time answers.", "")
+chat_intro = _safe_text(
+    "The thing you're overthinking at 2 a.m. You bring the question. "
+    "No scheduling. No waiting. An astrologer in your pocket. 24/7",
+    "",
+)
 chat_messages = _as_list(chat_feature.get("messages")) or _as_list(chat_default.get("messages"))
 chat_rows: list[str] = []
 for message in chat_messages[:8]:
@@ -210,26 +213,23 @@ chat_html = "".join(chat_rows)
 
 yearly_feature = _as_dict(homepage_content.get("yearly_feature"))
 yearly_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("yearly_feature"))
-yearly_label = _safe_text(yearly_feature.get("label"), str(yearly_default.get("label", "YEARLY FORECAST")))
-yearly_title = _safe_text(yearly_feature.get("title"), str(yearly_default.get("title", "")))
-yearly_p1 = _safe_text(yearly_feature.get("paragraph_1"), str(yearly_default.get("paragraph_1", "")))
-yearly_p2 = _safe_text(yearly_feature.get("paragraph_2"), str(yearly_default.get("paragraph_2", "")))
-yearly_tag = _safe_text(yearly_feature.get("tagline"), str(yearly_default.get("tagline", "")))
+yearly_title = _safe_text("YEARLY FORECAST", "")
+yearly_subheading = _safe_text("A month-by-month breakdown.", "")
+yearly_p1 = _safe_text(
+    "Most people fail because they push at the wrong time. "
+    "There are months built for expansion. Months built for consolidation. "
+    "This forecast shows you the pattern before it plays out.",
+    "",
+)
 
 social = _as_dict(homepage_content.get("social_proof"))
 social_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("social_proof"))
 social_title = _safe_text(social.get("title"), str(social_default.get("title", "What People Are Saying")))
-social_line = _safe_text(social.get("line"), str(social_default.get("line", "")))
+social_line = _safe_text("We're new here. You're early. We're looking forward to what you'll say.", "")
 social_placeholder = _safe_text(
     social.get("placeholder_text"),
     str(social_default.get("placeholder_text", "Testimonials coming soon")),
 )
-
-closing = _as_dict(homepage_content.get("closing"))
-closing_default = _as_dict(DEFAULT_HOMEPAGE_CONTENT.get("closing"))
-closing_title = _safe_text(closing.get("title"), str(closing_default.get("title", "")))
-closing_subtitle = _safe_text(closing.get("subtitle"), str(closing_default.get("subtitle", "")))
-closing_cta = str(closing.get("cta_text") or closing_default.get("cta_text") or "Meet Your Astrologer")
 
 st.markdown(
     """
@@ -425,6 +425,13 @@ st.markdown(
   font-weight: 500;
   font-size: 18px;
 }
+.orbit-subheading {
+  margin: 10px 0 0 0;
+  font-size: 18px;
+  color: #9999AA;
+  font-weight: 300;
+  line-height: 1.55;
+}
 .orbit-feature-daily .orbit-label {
   margin: 0 0 24px 0;
 }
@@ -454,12 +461,12 @@ st.markdown(
   margin: 0 auto;
 }
 .orbit-chat-section .orbit-h2 {
-  font-size: 36px;
-  margin: 16px 0 0 0;
+  font-size: 40px;
+  margin: 0;
 }
 .orbit-chat-section .orbit-body {
   font-size: 17px;
-  margin: 24px auto 0 auto;
+  margin: 18px auto 0 auto;
 }
 .orbit-chat-card {
   margin: 28px auto 0 auto;
@@ -717,24 +724,13 @@ st.markdown(
   <section class="orbit-chat-section">
     <div class="orbit-container">
       <div class="orbit-copy">
-        <p class="orbit-label">{chat_label}</p>
         <h2 class="orbit-h2">{chat_title}</h2>
+        <p class="orbit-subheading">{chat_subheading}</p>
         <p class="orbit-body">{chat_intro}</p>
       </div>
       <div class="orbit-chat-card">
         {chat_html}
       </div>
-      <p class="orbit-body orbit-chat-closing">{chat_closing}</p>
-    </div>
-  </section>
-
-  <section class="orbit-feature-section">
-    <div class="orbit-container orbit-copy">
-      <p class="orbit-label">{yearly_label}</p>
-      <h2 class="orbit-h2">{yearly_title}</h2>
-      <p class="orbit-body">{yearly_p1}</p>
-      <p class="orbit-body">{yearly_p2}</p>
-      <p class="orbit-tagline" style="font-size:16px;">{yearly_tag}</p>
     </div>
   </section>
 </div>
@@ -742,7 +738,24 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-_render_center_cta("Open Yearly Forecast", "yearly_section_cta", yearly_target)
+_render_center_cta("Start the Conversation", "chat_section_cta", chat_target)
+
+st.markdown(
+    f"""
+<div class="orbit-root">
+  <section class="orbit-feature-section">
+    <div class="orbit-container orbit-copy">
+      <h2 class="orbit-h2">{yearly_title}</h2>
+      <p class="orbit-subheading">{yearly_subheading}</p>
+      <p class="orbit-body">{yearly_p1}</p>
+    </div>
+  </section>
+</div>
+""",
+    unsafe_allow_html=True,
+)
+
+_render_center_cta("Map My Year", "yearly_section_cta", yearly_target)
 
 st.markdown(
     f"""
@@ -754,16 +767,7 @@ st.markdown(
       <div class="orbit-testimonial-placeholder">{social_placeholder}</div>
     </div>
   </section>
-
-  <section class="orbit-closing-section">
-    <div class="orbit-container orbit-copy">
-      <h2 class="orbit-h2">{closing_title}</h2>
-      <p class="orbit-subheadline">{closing_subtitle}</p>
-    </div>
-  </section>
 </div>
 """,
     unsafe_allow_html=True,
 )
-
-_render_center_cta(closing_cta, "closing_chatbot_cta", chat_target)
