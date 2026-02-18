@@ -79,6 +79,8 @@ with st.expander("Add new partner profile"):
             st.success("Partner profile saved. Re-run to select it.")
 
 manual_name = st.text_input("Or run a name-only reflection with:", value="") if partner is None else None
+if partner is None:
+    st.markdown("<div style='height:6px;'></div>", unsafe_allow_html=True)
 
 if st.button("Generate Between Us Reading", type="primary"):
     reading = service.get_or_create_between_us(

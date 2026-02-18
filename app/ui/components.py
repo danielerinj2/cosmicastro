@@ -185,7 +185,7 @@ h1, h2, h3, h4, h5, h6,
   font-weight: 500 !important;
 }}
 
-button, input, textarea, select, label, p, span, li, small, div {{
+button, input, textarea, select, label, p, li, small {{
   font-family: "Sora", sans-serif !important;
   font-weight: 300 !important;
 }}
@@ -281,6 +281,18 @@ button, input, textarea, select, label, p, span, li, small, div {{
 [data-testid="stMarkdownContainer"], .stCaption, label, p, h1, h2, h3, h4, h5, h6 {{
   color: {text_color} !important;
 }}
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stText"] p {{
+  line-height: 1.55 !important;
+}}
+[data-testid="stWidgetLabel"] {{
+  margin-bottom: 6px !important;
+}}
+[data-testid="stWidgetLabel"] p {{
+  line-height: 1.4 !important;
+  margin: 0 !important;
+  white-space: normal !important;
+}}
 .stAlert {{
   border: 1px solid {border_color};
 }}
@@ -293,9 +305,16 @@ button, input, textarea, select, label, p, span, li, small, div {{
   background: {card_bg};
   color: {text_color};
   border-color: {border_color};
+  min-height: 42px;
+}}
+[data-baseweb="select"] * {{
+  line-height: 1.35 !important;
 }}
 .stRadio [role="radiogroup"] label, .stCheckbox label {{
   color: {text_color} !important;
+}}
+.stTextInput, .stTextArea, .stDateInput, .stNumberInput, .stSelectbox, .stRadio, .stCheckbox {{
+  margin-bottom: 0.8rem !important;
 }}
 .stSlider [data-testid="stTickBarMin"], .stSlider [data-testid="stTickBarMax"] {{
   color: {muted_text};
